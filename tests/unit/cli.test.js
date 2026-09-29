@@ -68,6 +68,19 @@ test('main prints the version and help', async () => {
     assert.match(h.out(), /kestrel sm/);
 });
 
+test('under npm, a usage error explains that flags before "--" go to npm itself', async () => {
+    const f = fakeIo();
+    f.io.env = { npm_lifecycle_event: 'start' };
+    assert.equal(await main(['tests/fixtures/stack/kestrel.json'], f.io), 2);
+    assert.match(f.err(), /npm keeps the flags that come before "--"/);
+    assert.match(f.err(), /npm start -- pm --config kestrel\.json/);
+    assert.match(f.err(), /npm run pm/);
+
+    const direct = fakeIo();
+    await main(['frobnicate'], direct.io);
+    assert.doesNotMatch(direct.err(), /npm keeps/, 'no npm hint outside npm');
+});
+
 test('main reports usage errors on stderr with exit code 2', async () => {
     const f = fakeIo();
     assert.equal(await main(['--bogus'], f.io), 2);

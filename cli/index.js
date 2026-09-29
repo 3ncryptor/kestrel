@@ -23,6 +23,13 @@ const HANDLERS = {
     update,
 };
 
+// `npm start --pm --config x.json` hands --pm and --config to npm, and Kestrel only gets "x.json".
+const NPM_HINT = [
+    'Running through npm? npm keeps the flags that come before "--" for itself. Use:',
+    '  npm start -- pm --config kestrel.json      or the shortcuts: npm run pm · npm run sm · npm run demo',
+    '',
+].join('\n');
+
 const defaultIo = () => ({ stdout: process.stdout, stderr: process.stderr, stdin: process.stdin, cwd: process.cwd(), env: process.env });
 
 /**
@@ -37,6 +44,7 @@ async function main(argv, io = defaultIo()) {
     } catch (err) {
         if (!(err instanceof UsageError)) throw err;
         io.stderr.write(`kestrel: ${err.message}\nRun "kestrel --help" for usage.\n`);
+        if (io.env?.npm_lifecycle_event) io.stderr.write(NPM_HINT);
         return err.exitCode;
     }
     try {
