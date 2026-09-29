@@ -41,4 +41,24 @@ function signalPgid(pgid, signal) {
     }
 }
 
-module.exports = { deriveId, signalGroup, groupAlive, signalPgid };
+// How often waitForGroupExit checks whether the group is empty.
+const GROUP_POLL_MS = 20;
+
+/**
+ * Resolves once group `pgid` is empty. The members got their signal with the main process but can
+ * outlive its exit by a moment (still exiting, or not yet reaped); after `timeoutMs` what is left is
+ * SIGKILLed and this returns without waiting further.
+ * @param {number} pgid @param {number} timeoutMs
+ */
+async function waitForGroupExit(pgid, timeoutMs) {
+    const deadline = Date.now() + timeoutMs;
+    while (groupAlive(pgid)) {
+        if (Date.now() >= deadline) {
+            signalPgid(pgid, 'SIGKILL');
+            return;
+        }
+        await new Promise((resolve) => setTimeout(resolve, GROUP_POLL_MS));
+    }
+}
+
+module.exports = { deriveId, signalGroup, groupAlive, signalPgid, waitForGroupExit };

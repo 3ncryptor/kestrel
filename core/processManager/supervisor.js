@@ -9,7 +9,7 @@ const { createLogBuffer } = require('./logBuffer');
 const { createLogFile } = require('./logFile');
 const { createProbe } = require('./readiness');
 const { resolveEnv } = require('./env');
-const { signalGroup, groupAlive, signalPgid } = require('./groups');
+const { signalGroup, groupAlive, signalPgid, waitForGroupExit } = require('./groups');
 
 class Supervisor {
     /**
@@ -84,7 +84,7 @@ class Supervisor {
             if (this.pgid !== null && groupAlive(this.pgid)) signalPgid(this.pgid, 'SIGKILL');
             return;
         }
-        const { child, done } = this;
+        const { child, done, pgid } = this;
         if (!this.stopping) {
             this.stopping = true;
             this.ctx.publish({ status: 'stopping' });
@@ -92,6 +92,8 @@ class Supervisor {
             this.killTimer = setTimeout(() => signalGroup(child, 'SIGKILL'), this.def.stopTimeoutMs);
         }
         await done;
+        // Stopped means the whole group is gone, not only the main process.
+        if (pgid !== null) await waitForGroupExit(pgid, this.def.stopTimeoutMs);
     }
 
     shutdownSync() {
