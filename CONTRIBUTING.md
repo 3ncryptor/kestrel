@@ -107,6 +107,8 @@ single required check.
 - Pull requests use the template: what changed, how it was tested, and whether docs or the contract
   changed.
 - Releases are cut by maintainers from a tag; [RELEASING.md](RELEASING.md) has the steps.
+- Changing the UI, `--help` or the version? Run `bun run website:generate` and commit `website/src/generated/`: the
+  website shows real captures of the app, and CI checks they are current. See [website/README.md](website/README.md).
 
 ## Licence
 
