@@ -1,10 +1,11 @@
 # OpenSSF Scorecard: checks the repository's supply-chain practices (pinned actions, branch protection,
-# token permissions…). Results go to this repository's code-scanning tab only (publish_results: false).
+# token permissions…). Those are repository settings rather than code, so it runs weekly, when branch
+# protection changes, or by hand, not on every push. Results go to this repository's code-scanning tab
+# only (publish_results: false).
 name: Scorecard
 
 on:
-  push:
-    branches: [main]
+  branch_protection_rule:
   schedule:
     - cron: "41 5 * * 1"
   workflow_dispatch:
