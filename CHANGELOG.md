@@ -6,7 +6,9 @@ All notable changes to Kestrel are documented here. The format follows
 
 ## [Unreleased]
 
-Nothing has been released yet; the first release will be 0.1.0.
+## [0.1.0] - 2026-09-29
+
+The first preview release, for macOS and Linux on arm64 and x64.
 
 ### Added
 
@@ -27,6 +29,9 @@ Nothing has been released yet; the first release will be 0.1.0.
   self-update for standalone installs).
 - **Native macOS sampling** through Bun's FFI (libproc and Mach), and a `/proc` sampler on Linux that
   reads one file per process per tick.
-- **Packaging, prepared but not published:** standalone binaries for macOS and Linux (arm64, x64), a
-  checksum-verifying `curl | sh` installer, npm launcher and per-platform packages, and a Homebrew
-  formula generator.
+- **Install:** `npm install -g kestrel-tui` (a launcher plus one standalone binary per platform, no
+  install scripts, published with npm provenance), a checksum-verifying `curl | sh` installer, and
+  release archives with `SHA256SUMS` and GitHub build attestations.
+
+[Unreleased]: https://github.com/3ncryptor/kestrel/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/3ncryptor/kestrel/releases/tag/v0.1.0
