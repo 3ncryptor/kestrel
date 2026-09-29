@@ -68,10 +68,12 @@ function createNativeSource({ native, exec, now = Date.now, othersRefreshMs = OT
         return name;
     };
 
-    function identity(pid, key, shortName, next) {
+    // Strings are decoded only here, on a cache miss (a new process or a reused pid); decoding two names
+    // for every process every tick was the largest cost left in the native sampler.
+    function identity(pid, key, next) {
         const known = identities.get(pid);
-        const found = known && known.key === key ? known : null;
-        const resolved = found || (() => {
+        const resolved = known && known.key === key ? known : (() => {
+            const shortName = native.comm(pid) || String(pid);
             const command = native.path(pid) || shortName;
             return { key, command, name: path.basename(command) || shortName };
         })();
@@ -98,7 +100,7 @@ function createNativeSource({ native, exec, now = Date.now, othersRefreshMs = OT
     /** @returns {ProcessInfo} */
     function ownProcess(pid, t, next) {
         const startedAt = t.startSec * 1000 + Math.floor(t.startUsec / 1000);
-        const who = identity(pid, `${startedAt}`, t.name || t.comm, next);
+        const who = identity(pid, `${startedAt}`, next);
         return {
             pid, ppid: t.ppid, name: who.name, command: who.command, user: userName(t.uid), state: stateOf(t.status, t.running),
             rssKB: Math.round(t.rssBytes / 1024), cpuTicks: t.cpuNs, startedAt,
@@ -107,7 +109,8 @@ function createNativeSource({ native, exec, now = Date.now, othersRefreshMs = OT
 
     /** @returns {ProcessInfo} */
     function otherProcess(pid, s, extra, next) {
-        const who = identity(pid, s.comm, s.comm, next);
+        // No start time without root: ps's (every 5 s) tells a reused pid apart.
+        const who = identity(pid, `${extra ? extra.startedAt : ''}`, next);
         return {
             pid, ppid: s.ppid, name: who.name, command: who.command, user: userName(s.uid),
             state: extra ? extra.state : stateOf(s.status, 0), rssKB: extra ? extra.rssKB : 0,
@@ -171,7 +174,7 @@ function createNativeSource({ native, exec, now = Date.now, othersRefreshMs = OT
                 const key = `${pid}|${address}|${port}`;
                 if (seen.has(key)) continue;
                 seen.add(key);
-                const name = identities.get(pid)?.name ?? native.shortInfo(pid)?.comm ?? null;
+                const name = identities.get(pid)?.name ?? native.comm(pid);
                 items.push({ port, address, proto: 'tcp', pid, name });
             }
         }

@@ -22,7 +22,7 @@ const MAX_PIDS = 1 << 16;
 const MAX_FDS = 1 << 16;
 
 // struct proc_taskallinfo = proc_bsdinfo (136) + proc_taskinfo (96)
-const TASK = { size: 232, status: 4, ppid: 16, uid: 20, comm: 48, commLen: 16, name: 64, nameLen: 32, startSec: 120, startUsec: 128,
+const TASK = { size: 232, status: 4, ppid: 16, uid: 20, startSec: 120, startUsec: 128,
     rss: 136 + 8, user: 136 + 16, system: 136 + 24, running: 136 + 88 };
 const SHORT = { size: 64, ppid: 4, status: 12, comm: 16, commLen: 16, uid: 36 };
 // struct socket_fdinfo: psi (socket_info) at 24; soi_kind at +232; soi_proto (tcp_sockinfo) at +240
@@ -75,7 +75,7 @@ function createNative(ffi) {
 
     const timebase = new Uint32Array(2);
     system.mach_timebase_info(ptr(timebase));
-    const [numer, denom] = [BigInt(timebase[0]), BigInt(timebase[1])];
+    const ticksToNs = timebase[0] / timebase[1];
     const host = system.mach_host_self(); // one send right for the whole run
 
     function sysctl(name, bytes) {
@@ -97,20 +97,22 @@ function createNative(ffi) {
         }
     }
 
+    // 64-bit fields as two 32-bit halves: exact below 2^53 and much cheaper than BigInt (this runs for
+    // every process every tick).
+    const u64 = (view, offset) => view.getUint32(offset, true) + view.getUint32(offset + 4, true) * 2 ** 32;
+
+    /** Numbers only: names are decoded separately, and only for processes seen for the first time. */
     function taskInfo(pid) {
         if (libproc.proc_pidinfo(pid, PROC_PIDTASKALLINFO, 0n, ptr(task), TASK.size) !== TASK.size) return null;
-        const cpu = taskView.getBigUint64(TASK.user, true) + taskView.getBigUint64(TASK.system, true);
         return {
             ppid: taskView.getUint32(TASK.ppid, true),
             uid: taskView.getUint32(TASK.uid, true),
             status: taskView.getUint32(TASK.status, true),
             running: taskView.getInt32(TASK.running, true),
-            comm: cString(task, TASK.comm, TASK.commLen),
-            name: cString(task, TASK.name, TASK.nameLen),
-            startSec: Number(taskView.getBigUint64(TASK.startSec, true)),
-            startUsec: Number(taskView.getBigUint64(TASK.startUsec, true)),
-            rssBytes: Number(taskView.getBigUint64(TASK.rss, true)),
-            cpuNs: Number((cpu * numer) / denom), // Mach absolute time → ns
+            startSec: u64(taskView, TASK.startSec),
+            startUsec: u64(taskView, TASK.startUsec),
+            rssBytes: u64(taskView, TASK.rss),
+            cpuNs: (u64(taskView, TASK.user) + u64(taskView, TASK.system)) * ticksToNs, // Mach absolute time → ns
         };
     }
 
@@ -120,8 +122,13 @@ function createNative(ffi) {
             ppid: shortView.getUint32(SHORT.ppid, true),
             uid: shortView.getUint32(SHORT.uid, true),
             status: shortView.getUint32(SHORT.status, true),
-            comm: cString(short, SHORT.comm, SHORT.commLen),
         };
+    }
+
+    /** The kernel's short name (16 chars), for processes without an executable path (kernel_task…). */
+    function comm(pid) {
+        if (libproc.proc_pidinfo(pid, PROC_PIDT_SHORTBSDINFO, 0n, ptr(short), SHORT.size) !== SHORT.size) return null;
+        return cString(short, SHORT.comm, SHORT.commLen) || null;
     }
 
     function path(pid) {
@@ -181,7 +188,7 @@ function createNative(ffi) {
         return found;
     }
 
-    return { listPids, taskInfo, shortInfo, path, userName, vmStats, swapUsage, listeningSockets };
+    return { listPids, taskInfo, shortInfo, comm, path, userName, vmStats, swapUsage, listeningSockets };
 }
 
 /** The native layer, or null (not Bun on macOS, dlopen failed, or the self-check disagreed). */

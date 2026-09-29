@@ -17,10 +17,15 @@ function fakeNative() {
         1: { ppid: 0, uid: 0, status: 2, comm: 'launchd' },
         88: { ppid: 1, uid: 88, status: 2, comm: 'WindowServer' },
     };
+    const numbersOnly = ({ comm, name, ...numbers }) => numbers; // per-tick calls never decode strings
     const native = {
         listPids: () => [1, 88, 100, 200],
-        taskInfo: (pid) => own[pid] || null,
-        shortInfo: (pid) => others[pid] || (own[pid] && { ppid: own[pid].ppid, uid: own[pid].uid, status: own[pid].status, comm: own[pid].comm }) || null,
+        taskInfo: (pid) => (own[pid] ? numbersOnly(own[pid]) : null),
+        shortInfo: (pid) => {
+            const p = others[pid] || own[pid];
+            return p ? { ppid: p.ppid, uid: p.uid, status: p.status } : null;
+        },
+        comm: (pid) => (calls.comm = (calls.comm || 0) + 1, (others[pid] || own[pid])?.comm ?? null),
         path: (pid) => (calls.path.push(pid), { 1: '/sbin/launchd', 88: '/System/WindowServer', 100: '/usr/local/bin/node', 200: '/opt/esbuild' }[pid] || null),
         userName: (uid) => (calls.userName.push(uid), { 0: 'root', 88: '_windowserver', 501: 'alice' }[uid] || null),
         vmStats: () => ({ pageSize: 16384, free: 1000, active: 2000, inactive: 1500, wire: 3000, speculative: 100, purgeable: 200, compressor: 400, external: 5000, internal: 7000 }),
@@ -104,6 +109,15 @@ test('paths and user names are looked up once per process, and again when a pid 
     fake.own[100] = { ...fake.own[100], startSec: START + 999 }; // pid 100 exited and was reused
     await src.listProcesses();
     assert.deepEqual(fake.calls.path.filter((p) => p === 100).length, 2);
+});
+
+test('short names are only decoded when a process is new (identity cache miss)', async () => {
+    const { src, fake } = source();
+    fake.native.path = () => null;
+    await src.listProcesses();
+    const first = fake.calls.comm;
+    await src.listProcesses();
+    assert.equal(fake.calls.comm, first);
 });
 
 test('a process without a path (kernel, or gone) falls back to its short name', async () => {

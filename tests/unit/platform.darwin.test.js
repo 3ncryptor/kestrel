@@ -173,8 +173,9 @@ test('adapter exposes per-core CPU times and load average from os', () => {
 test('the adapter samples natively when the native layer loads, with nanosecond cpu time', async () => {
     const native = {
         listPids: () => [100],
-        taskInfo: () => ({ ppid: 1, uid: 501, status: 2, running: 0, comm: 'node', name: 'node', startSec: 1, startUsec: 0, rssBytes: 1024, cpuNs: 5 }),
+        taskInfo: () => ({ ppid: 1, uid: 501, status: 2, running: 0, startSec: 1, startUsec: 0, rssBytes: 1024, cpuNs: 5 }),
         shortInfo: () => null,
+        comm: () => 'node',
         path: () => '/usr/local/bin/node',
         userName: () => 'alice',
     };
