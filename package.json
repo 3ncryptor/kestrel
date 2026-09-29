@@ -32,6 +32,10 @@
   "scripts": {
     "start": "NODE_ENV=production bun cli/index.js",
     "dev": "bun cli/index.js",
+    "pm": "NODE_ENV=production bun cli/index.js pm",
+    "sm": "NODE_ENV=production bun cli/index.js sm",
+    "demo": "NODE_ENV=production bun cli/index.js pm --config tests/fixtures/stack/kestrel.json",
+    "doctor": "bun cli/index.js doctor",
     "test": "node --test --test-timeout=20000 tests/unit tests/integration",
     "test:bun": "bun test --timeout 20000 tests/unit tests/integration",
     "test:ui": "bun test tests/ui",
@@ -39,7 +43,8 @@
     "typecheck": "tsc -p tsconfig.core.json",
     "build": "bun scripts/build.js",
     "build:archive": "bun scripts/build.js --archive",
-    "lint": "biome lint"
+    "lint": "biome lint",
+    "setup": "sh ./setup.sh"
   },
   "dependencies": {
     "@opentui/core": "0.5.12",
