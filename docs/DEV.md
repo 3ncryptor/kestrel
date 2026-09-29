@@ -34,6 +34,14 @@ On Windows use WSL2 for everything below (see CONTRIBUTING.md); Git Bash covers 
 | `bun scripts/bench.js 30` | Engine CPU over 30 s **including the processes it spawns** (ps, lsof…), RSS and tick cost, against the < 1% budget; exits 1 when over |
 | `bun cli/index.js --help` | CLI usage |
 
+## CI
+
+`.github/workflows/ci.yml` starts with a job that classifies the diff (`scripts/ci-changes.sh`, tested
+by `tests/unit/ci-changes.test.js`), and the other jobs run only when that part of the code changed. A
+docs-only change runs no jobs at all. See the table in CONTRIBUTING.md. To test everything regardless,
+run the workflow by hand (Actions → CI → Run workflow). CodeQL skips docs-only changes and Scorecard
+runs weekly.
+
 ## End to end, in a real terminal
 
 ```sh

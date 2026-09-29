@@ -56,8 +56,19 @@ npm run test:ui       # UI frame tests
 sh scripts/e2e/pm-e2e.sh   # optional locally, required in CI: kestrel pm in a real terminal
 ```
 
-CI runs all of this on macOS and Linux, plus Debian and Amazon Linux containers and a build of every
-binary target.
+CI runs what your change can affect (the rules are in `scripts/ci-changes.sh`):
+
+| You changed | CI runs |
+|---|---|
+| Only docs (Markdown, `docs/`, issue templates) | Nothing but the "CI result" check, in seconds |
+| Code | Lint, types, shellcheck, and the test suites plus the terminal E2E on Linux |
+| Platform or process code (`core/platform`, `core/processManager`, `core/stack`, e2e scripts) | Also macOS, and Debian + Amazon Linux containers |
+| `setup.sh`, `setup.ps1`, `.husky/`, `package.json`, `bun.lock` | Also the developer setup on Linux, macOS and Windows |
+| Engine code (`core/`) | Also the CPU regression guard |
+| Build tooling (`scripts/build.js`, `packaging/`) | Also the four standalone binaries |
+
+Pushes to `main` also run macOS and build the binaries whenever code changed. "CI result" is the
+single required check.
 
 ## How the code is organised
 
