@@ -144,6 +144,43 @@ html.lenis {
     100% { transform: translate(64px, 45px); }
 }
 
+/* The hero wordmark (MeterWordmark): meter cells that fill left to right, flicker, and trail the pointer. */
+.wm-empty {
+    fill: #17171a;
+    transition: fill 900ms ease-out;
+}
+.wm-empty:hover {
+    fill: color-mix(in srgb, var(--k-green) 38%, #17171a);
+    transition-duration: 0ms;
+}
+.wm-lit {
+    animation: wm-fill 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.wm-flicker {
+    animation: wm-flicker 6s linear infinite;
+}
+@keyframes wm-fill {
+    from {
+        opacity: 0;
+    }
+}
+@keyframes wm-flicker {
+    0%,
+    100% {
+        fill: #17171a;
+    }
+    3% {
+        fill: color-mix(in srgb, var(--k-green) 30%, #17171a);
+    }
+    9% {
+        fill: #17171a;
+    }
+}
+/* The project menu's "Effects off" (set before first paint by the script in layout.tsx). */
+html[data-effects="off"] :where(.wm-lit, .wm-flicker) {
+    animation: none;
+}
+
 @keyframes blink {
     50% {
         opacity: 0;
