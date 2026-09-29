@@ -1,8 +1,8 @@
 "use client";
 
+import { Mesh, Program, Renderer, Triangle } from "ogl";
 import type React from "react";
 import { useEffect, useRef } from "react";
-import { Renderer, Program, Mesh, Triangle } from "ogl";
 
 export interface GrainientProps {
   timeSpeed?: number;
@@ -254,7 +254,13 @@ export const Grainient: React.FC<GrainientProps> = ({
       raf = requestAnimationFrame(loop);
     };
 
+    // Adapted for the Kestrel site: under reduced motion, draw one still frame and never loop.
+    const isStill = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const tryStart = () => {
+      if (isStill) {
+        renderer.render({ scene: mesh });
+        return;
+      }
       if (isVisible && isPageVisible && raf === 0) {
         raf = requestAnimationFrame(loop);
       }

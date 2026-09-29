@@ -23,6 +23,17 @@
     --color-k-teal: var(--k-teal);
     /* Small muted text on the site: Catppuccin overlay1, 5.6:1 on black (overlay0 is 4.3:1, decoration only). */
     --color-k-muted: #7f849c;
+    /* The shadcn-style names that vendored components use (text-muted-foreground, border-border…), on the palette. */
+    --color-background: var(--k-base);
+    --color-foreground: var(--k-text);
+    --color-border: var(--k-surface1);
+    --color-muted: var(--k-surface0);
+    --color-muted-foreground: #7f849c;
+    --color-card: var(--k-mantle);
+    --color-card-foreground: var(--k-text);
+    --color-primary: var(--k-mauve);
+    --color-primary-foreground: var(--k-base);
+    --color-ring: var(--k-mauve);
     --font-mono: "Kestrel Mono", "Kestrel Symbols", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }

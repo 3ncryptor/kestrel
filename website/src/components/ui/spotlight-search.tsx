@@ -1,8 +1,8 @@
 "use client";
 
+import { AnimatePresence, motion, type Transition, useReducedMotion } from "motion/react";
 import type React from "react";
-import { useId, useRef, useState, useMemo } from "react";
-import { AnimatePresence, motion, type Transition } from "motion/react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export type SpotlightFilterId = "apps" | "folders" | "layers" | "docs";
@@ -82,6 +82,8 @@ const DEFAULT_ITEMS: SpotlightItem[] = [
     subtitle: "Markdown File",
   },
 ];
+
+const INSTANT: Transition = { duration: 0 };
 
 const fluidSpring: Transition = {
   type: "spring",
@@ -241,6 +243,13 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
     : uncontrolledFilter;
 
   const [highlightedIndex, setHighlightedIndex] = useState(0);
+  // Adapted for the Kestrel site: the combobox pattern (the input owns a listbox, with aria-activedescendant), and
+  // springs become instant under reduced motion.
+  const listId = `${inputId}-results`;
+  const optionId = (index: number) => `${inputId}-option-${index}`;
+  const reduceMotion = useReducedMotion() ?? false;
+  const spring = reduceMotion ? INSTANT : fluidSpring;
+  const micro = reduceMotion ? INSTANT : microSpring;
 
   const isExpanded = isHovered || isFocused || query.length > 0;
 
@@ -260,6 +269,13 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
     filteredItems.length > 0
       ? Math.min(Math.max(0, highlightedIndex), filteredItems.length - 1)
       : 0;
+
+  const resultsOpen = showResults && isFocused && (query.trim().length > 0 || currentFilter !== null);
+  const activeOption = resultsOpen && filteredItems.length > 0 ? optionId(safeHighlightedIndex) : undefined;
+
+  useEffect(() => {
+    if (activeOption) document.getElementById(activeOption)?.scrollIntoView({ block: "nearest" });
+  }, [activeOption]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -384,7 +400,7 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
             animate={{
               width: isExpanded ? 248 : 480,
             }}
-            transition={fluidSpring}
+            transition={spring}
             className="absolute left-0 top-0 h-12 rounded-full bg-zinc-200/90 dark:bg-[#1c1c1f]"
           />
 
@@ -398,7 +414,7 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
                 opacity: isExpanded ? 1 : 0,
               }}
               transition={{
-                ...fluidSpring,
+                ...spring,
                 delay: isExpanded
                   ? idx * 0.035
                   : (FILTER_BUTTONS.length - 1 - idx) * 0.025,
@@ -413,7 +429,7 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
           animate={{
             width: isExpanded ? 248 : 480,
           }}
-          transition={fluidSpring}
+          transition={spring}
           onClick={() => inputRef.current?.focus()}
           className={cn(
             "absolute left-0 top-0 h-12 flex items-center px-4 rounded-full border transition-colors cursor-text select-none",
@@ -434,6 +450,12 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
               // biome-ignore lint/a11y/noAutofocus: only set by the search dialog, which the user just opened
               autoFocus={autoFocus}
               type="text"
+              role="combobox"
+              aria-label={dynamicPlaceholder}
+              aria-expanded={resultsOpen}
+              aria-controls={listId}
+              aria-autocomplete="list"
+              aria-activedescendant={activeOption}
               value={query}
               onChange={handleInputChange}
               onFocus={() => setIsFocused(true)}
@@ -480,7 +502,7 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
                 pointerEvents: isExpanded ? "auto" : "none",
               }}
               transition={{
-                ...fluidSpring,
+                ...spring,
                 delay: isExpanded
                   ? idx * 0.035
                   : (FILTER_BUTTONS.length - 1 - idx) * 0.025,
@@ -495,7 +517,7 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
                 type="button"
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.92 }}
-                transition={microSpring}
+                transition={micro}
                 onMouseEnter={() => setHoveredButtonId(btn.id)}
                 onMouseLeave={() => setHoveredButtonId(null)}
                 onClick={() => handleFilterToggle(btn.id)}
@@ -519,7 +541,7 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
                     initial={{ opacity: 0, y: 6, scale: 0.9 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 4, scale: 0.9 }}
-                    transition={microSpring}
+                    transition={micro}
                     className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-zinc-900/90 border border-zinc-700 text-[10px] text-zinc-100 font-medium whitespace-nowrap pointer-events-none z-50 shadow-lg dark:bg-black/90 dark:border-white/10 dark:text-zinc-200"
                   >
                     {btn.label}
@@ -531,15 +553,16 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
         })}
       </div>
 
+      <p className="sr-only" aria-live="polite">
+        {resultsOpen ? `${filteredItems.length} ${filteredItems.length === 1 ? "result" : "results"}` : ""}
+      </p>
       <AnimatePresence>
-        {showResults &&
-          isFocused &&
-          (query.trim().length > 0 || currentFilter) && (
+        {resultsOpen && (
             <motion.div
               initial={{ opacity: 0, y: -6, scale: 0.98 }}
               animate={{ opacity: 1, y: 10, scale: 1 }}
               exit={{ opacity: 0, y: -6, scale: 0.98 }}
-              transition={fluidSpring}
+              transition={spring}
               className={cn(
                 "absolute top-full inset-x-0 z-40 rounded-2xl border border-zinc-200 bg-white/95 backdrop-blur-3xl shadow-[0_24px_60px_rgba(0,0,0,0.1)] p-2 overflow-hidden flex flex-col gap-1 dark:border-white/12 dark:bg-[#141416]/95 dark:shadow-[0_24px_60px_rgba(0,0,0,0.85)]",
               )}
@@ -549,13 +572,18 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
                   No matching results found
                 </div>
               ) : (
-                <div className="flex flex-col gap-0.5 max-h-64 overflow-y-auto pr-1">
+                <div id={listId} role="listbox" aria-label="Results" className="flex flex-col gap-0.5 max-h-64 overflow-y-auto pr-1">
                   {filteredItems.map((item, idx) => {
                     const isHighlighted = idx === safeHighlightedIndex;
                     return (
-                      <button
+                      // biome-ignore lint/a11y/useKeyWithClickEvents: the combobox input handles the keys (arrows + Enter)
+                      <div
                         key={item.id}
-                        type="button"
+                        id={optionId(idx)}
+                        role="option"
+                        aria-selected={isHighlighted}
+                        tabIndex={-1}
+                        onMouseDown={(e) => e.preventDefault()}
                         onMouseEnter={() => setHighlightedIndex(idx)}
                         onClick={() => {
                           onSubmit?.(item.title, currentFilter);
@@ -592,7 +620,7 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
                             {item.shortcut}
                           </span>
                         )}
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
