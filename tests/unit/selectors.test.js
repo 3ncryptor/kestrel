@@ -98,3 +98,35 @@ test('deriveProcessRows tags managedId and level, in table and tree views', () =
     assert.equal(tree.rows[0].depth, 0);
     assert.equal(table.resources.get('api').procCount, 3);
 });
+
+// ---------- M4 performance (exact same results, less work) ----------
+
+test('topBy returns exactly what a full sort would, ties included', () => {
+    const { topBy, comparator } = sel;
+    const procs = Array.from({ length: 300 }, (_, i) => ({ pid: 1000 - i, cpu: (i * 7) % 11, memMB: i % 5, name: `p${i}`, command: '' }));
+    const cmp = comparator({ sortBy: 'cpu', sortDir: 'desc' });
+    assert.deepEqual(topBy(procs, 5, cmp), [...procs].sort(cmp).slice(0, 5));
+    assert.deepEqual(topBy(procs.slice(0, 3), 5, cmp), [...procs.slice(0, 3)].sort(cmp));
+    assert.deepEqual(topBy([], 5, cmp), []);
+});
+
+test('buildTree descendant counts on a deep tree', () => {
+    const chain = [1, 2, 3, 4].map((pid) => ({ pid, ppid: pid - 1 || 1, name: `n${pid}`, command: '', cpu: 0, memMB: 0 }));
+    const leaves = [5, 6].map((pid) => ({ pid, ppid: 2, name: `n${pid}`, command: '', cpu: 0, memMB: 0 }));
+    const rows = sel.buildTree([...chain, ...leaves], { sortBy: 'pid', sortDir: 'asc', filterQuery: '', collapsedPids: [] });
+    assert.deepEqual(rows.map((r) => [r.pid, r.descendantCount]), [[1, 5], [2, 4], [3, 1], [4, 0], [5, 0], [6, 0]]);
+});
+
+test('indexChildren stays linear for a parent with many children (it was quadratic)', () => {
+    const procs = Array.from({ length: 20000 }, (_, i) => ({ pid: i + 2, ppid: 1 }));
+    const t0 = performance.now();
+    const children = sel.indexChildren(procs);
+    assert.ok(performance.now() - t0 < 200, `${(performance.now() - t0).toFixed(0)} ms`);
+    assert.equal(children.get(1).length, 20000);
+    assert.equal(children.get(1)[19999], 20001);
+});
+
+test('linkManaged does no tree work when nothing managed is running', () => {
+    const procs = [{ pid: 1, ppid: 1, cpu: 1, memMB: 1 }];
+    assert.deepEqual(sel.linkManaged(procs, [{ id: 'api', pid: null }]), { byPid: new Map(), resources: new Map() });
+});

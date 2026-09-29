@@ -26,6 +26,22 @@ function comparator({ sortBy, sortDir }) {
     };
 }
 
+/**
+ * The first `n` items in `cmp` order, as a full sort would give them (ties included), in one pass
+ * with a small sorted buffer instead of sorting everything.
+ */
+function topBy(items, n, cmp) {
+    const top = [];
+    for (const item of items) {
+        if (top.length === n && cmp(item, top[n - 1]) >= 0) continue;
+        let i = top.length;
+        while (i > 0 && cmp(item, top[i - 1]) < 0) i -= 1;
+        top.splice(i, 0, item);
+        if (top.length > n) top.pop();
+    }
+    return top;
+}
+
 /** Filter then sort. */
 function applyView(processes, { sortBy, sortDir, filterQuery }) {
     const query = filterQuery.trim().toLowerCase();
@@ -57,7 +73,10 @@ function indexChildren(processes) {
     const children = new Map();
     for (const p of processes) {
         if (p.ppid === p.pid) continue;
-        children.set(p.ppid, [...(children.get(p.ppid) || []), p.pid]);
+        // Appending to the local list: copying it per child was quadratic (launchd has ~400 children).
+        const list = children.get(p.ppid);
+        if (list) list.push(p.pid);
+        else children.set(p.ppid, [p.pid]);
     }
     return children;
 }
@@ -81,6 +100,7 @@ function collectSubtree(rootPid, children) {
  * @param {{ id: string, pid: number|null }[]} managed
  */
 function linkManaged(processes, managed) {
+    if (!managed.some((m) => m.pid !== null)) return { byPid: new Map(), resources: new Map() };
     const byPidProcess = new Map(processes.map((p) => [p.pid, p]));
     const children = indexChildren(processes);
     const byPid = new Map();
@@ -134,13 +154,24 @@ function buildTree(processes, { sortBy, sortDir, filterQuery, collapsedPids }) {
     const byPid = new Map(sorted.map((p) => [p.pid, p]));
     const rows = [];
     const seen = new Set();
+    // Subtree sizes, memoized: computing each row's subtree separately was O(n·depth).
+    const sizes = new Map();
+    const sizeOf = (pid, path = new Set()) => {
+        if (sizes.has(pid)) return sizes.get(pid);
+        if (path.has(pid)) return 0; // a cycle (pid reuse): count each process once
+        path.add(pid);
+        const size = 1 + (children.get(pid) || []).reduce((n, kid) => n + sizeOf(kid, path), 0);
+        path.delete(pid);
+        sizes.set(pid, size);
+        return size;
+    };
 
     const visit = (pid, depth) => {
         if (seen.has(pid)) return;
         seen.add(pid);
         const kids = children.get(pid) || [];
         const isCollapsed = collapsed.has(pid) && kids.length > 0;
-        const descendantCount = collectSubtree(pid, children).size - 1;
+        const descendantCount = sizeOf(pid) - 1;
         rows.push({ ...byPid.get(pid), depth, hasChildren: kids.length > 0, collapsed: isCollapsed, descendantCount });
         if (!isCollapsed) kids.forEach((kid) => visit(kid, depth + 1));
     };
@@ -157,12 +188,14 @@ function deriveProcessRows(raw, managed, ui, thresholds) {
     const tagged = raw.map((p) => ({ ...p, managedId: byPid.get(p.pid) ?? null, level: processLevel(p, thresholds) }));
     const rows = ui.monitorView === 'tree' ? buildTree(tagged, ui) : applyView(tagged, ui);
     // The Overview's "top consumers" must not change because of a Monitor filter or sort.
-    const top = applyView(tagged, { sortBy: 'cpu', sortDir: 'desc', filterQuery: '' }).slice(0, TOP_CONSUMERS);
+    const top = topBy(tagged, TOP_CONSUMERS, comparator({ sortBy: 'cpu', sortDir: 'desc' }));
     return { rows, resources, byPid, top };
 }
 
 module.exports = {
     applyView,
+    comparator,
+    topBy,
     reconcileSelection,
     thresholdLevel,
     processLevel,
