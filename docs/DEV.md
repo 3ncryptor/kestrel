@@ -26,7 +26,7 @@ bun install
 | `npm run dev` | Same UI with React's development build (clearer errors, ~2× the CPU) |
 | `npm run test:ui` | UI frame tests (Bun + OpenTUI test renderer) |
 | `bun cli/index.js sm --dump --ticks 3` | Headless: prints 3 JSON snapshots of the live system |
-| `bun scripts/bench.js 30` | Engine CPU/RSS over 30 s against the PRD budget; exits 1 when over |
+| `bun scripts/bench.js 30` | Engine CPU over 30 s **including the processes it spawns** (ps, lsof…), RSS and tick cost, against the < 1% budget; exits 1 when over |
 | `bun cli/index.js --help` | CLI usage |
 
 ## End to end, in a real terminal
@@ -54,7 +54,9 @@ images with `KESTREL_TEST_IMAGES="ubuntu:24.04 debian:12" scripts/docker-test.sh
 ## Measuring the interactive UI
 
 The UI needs a real terminal, so it is measured in a pseudo-terminal with the cumulative CPU time from
-`ps -o time=` over 60 s. **Always set `NODE_ENV=production` at process start** (as `npm start` does): Bun
+`ps -o time=` over 60 s. That figure covers Kestrel's own process only. Add the cost of the processes it
+spawns, which `scripts/bench.js` measures for the engine. Before M4 they were most of the total, and
+leaving them out once made a real ~5% look like 2.6%. **Always set `NODE_ENV=production` at process start** (as `npm start` does): Bun
 fixes the JSX transform when the process starts, so changing it later crashes the UI. Check the capture
 shows the screen actually rendered: a crashed UI costs almost nothing and makes the numbers look great.
 Current numbers: BUILD_PLAN §11.1 (dashboard) and §11.2 (`kestrel pm` with streaming logs).
