@@ -70,7 +70,7 @@ main() {
 
     tmp=$(mktemp -d)
     trap 'rm -rf "$tmp"' EXIT INT TERM
-    say "Downloading kestrel $version for $target…"
+    say "Downloading kestrel ${version} for ${target}..."
     fetch "$base/$asset" "$tmp/$asset" || die "download failed: $base/$asset"
     fetch "$base/SHA256SUMS" "$tmp/SHA256SUMS" || die "download failed: $base/SHA256SUMS"
 

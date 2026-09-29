@@ -11,6 +11,7 @@ const { execFileSync, spawnSync } = require('node:child_process');
 const INSTALLER = path.join(__dirname, '..', '..', 'packaging', 'install.sh');
 const VERSION = '0.2.0';
 const TARGET = `${process.platform}-${process.arch}`;
+const UTF8_LOCALE = process.platform === 'darwin' ? 'en_US.UTF-8' : 'C.UTF-8';
 
 async function fakeRelease(t, { tamper = false } = {}) {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kestrel-installer-'));
@@ -37,7 +38,9 @@ async function fakeRelease(t, { tamper = false } = {}) {
 function install(env) {
     // spawnSync would block the event loop that serves the fake release; run the shell asynchronously.
     return new Promise((resolve) => {
-        const child = require('node:child_process').spawn('sh', [INSTALLER], { env: { PATH: process.env.PATH, HOME: env.HOME, ...env } });
+        // A UTF-8 locale, as in a real terminal: macOS /bin/sh (bash 3.2) then reads multibyte text as part of
+        // a variable name ("$target…" became the unset variable "target…").
+        const child = require('node:child_process').spawn('sh', [INSTALLER], { env: { PATH: process.env.PATH, HOME: env.HOME, LC_ALL: UTF8_LOCALE, ...env } });
         let out = '';
         child.stdout.on('data', (d) => (out += d));
         child.stderr.on('data', (d) => (out += d));
@@ -74,4 +77,11 @@ test('install.sh explains an unsupported platform', () => {
     } finally {
         fs.rmSync(fakeUname, { recursive: true, force: true });
     }
+});
+
+test('install.sh is plain ASCII, so no shell or locale can misread it', () => {
+    const offending = fs.readFileSync(INSTALLER, 'utf-8').split('\n')
+        .map((line, i) => ({ line: i + 1, text: line }))
+        .filter(({ text }) => /[^\t -~]/.test(text));
+    assert.deepEqual(offending, []);
 });
