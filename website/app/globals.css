@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "../src/generated/tokens.css";
 
+/* The site is dark only: DevClub UI components style themselves with dark: variants. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Kestrel's palette (generated from ui/theme/tokens.js) as Tailwind colours: bg-k-base, text-k-mauve… */
 @theme inline {
     --color-k-base: var(--k-base);
@@ -98,5 +101,11 @@
 @keyframes blink {
     50% {
         opacity: 0;
+    }
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
     }
 }

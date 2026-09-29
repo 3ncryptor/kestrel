@@ -21,7 +21,7 @@ export type MacSwitchColor =
   | "amber"
   | "monochrome";
 
-export type MacSwitchSize = "sm" | "md" | "lg";
+export type MacSwitchSize = "xs" | "sm" | "md" | "lg";
 export type MacSwitchMaterial = "liquid" | "frosted" | "clear";
 
 export interface SwitchFilterProps {
@@ -94,6 +94,14 @@ const SWITCH_SIZES: Record<
     bezelWidth: number;
   }
 > = {
+  // xs: for toolbars (added for the Kestrel site).
+  xs: {
+    sliderWidth: 44,
+    sliderHeight: 22,
+    thumbWidth: 38,
+    thumbHeight: 26,
+    bezelWidth: 6,
+  },
   sm: {
     sliderWidth: 120,
     sliderHeight: 50,
@@ -328,6 +336,8 @@ export interface MacSwitchProps {
   refractionLevel?: number;
   blurLevel?: number;
   className?: string;
+  /** The accessible name (a switch needs one; there is no visible <label> inside it). */
+  label?: string;
 }
 
 export const MacSwitch: React.FC<MacSwitchProps> = ({
@@ -336,6 +346,7 @@ export const MacSwitch: React.FC<MacSwitchProps> = ({
   onChange,
   disabled = false,
   size = "md",
+  label,
   color = "green",
   material = "liquid",
   forceActive = false,
@@ -566,6 +577,7 @@ export const MacSwitch: React.FC<MacSwitchProps> = ({
       <motion.div
         role="switch"
         aria-checked={isChecked}
+        aria-label={label}
         tabIndex={disabled ? -1 : 0}
         onKeyDown={handleKeyDown}
         onPointerDown={handlePointerDown}

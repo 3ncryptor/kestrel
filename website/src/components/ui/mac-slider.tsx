@@ -21,7 +21,7 @@ export type MacSliderColor =
   | "cyan"
   | "monochrome";
 
-export type MacSliderSize = "sm" | "md" | "lg";
+export type MacSliderSize = "xs" | "sm" | "md" | "lg";
 export type MacSliderMaterial = "liquid" | "frosted" | "clear";
 
 export interface FilterProps {
@@ -95,6 +95,15 @@ const SIZE_CONFIGS: Record<
     bezelWidth: number;
   }
 > = {
+  // xs: for toolbars (added for the Kestrel site).
+  xs: {
+    sliderWidth: 120,
+    sliderHeight: 6,
+    thumbWidth: 34,
+    thumbHeight: 22,
+    thumbRadius: 11,
+    bezelWidth: 6,
+  },
   sm: {
     sliderWidth: 260,
     sliderHeight: 10,
@@ -333,6 +342,10 @@ export interface MacSliderProps {
   blurLevel?: number;
   className?: string;
   disabled?: boolean;
+  /** The accessible name of the slider. */
+  label?: string;
+  /** How a value is announced, e.g. 1 → "standard". */
+  valueText?: (value: number) => string;
 }
 
 export const MacSlider: React.FC<MacSliderProps> = ({
@@ -344,6 +357,8 @@ export const MacSlider: React.FC<MacSliderProps> = ({
   onChange,
   color = "blue",
   size = "md",
+  label,
+  valueText,
   material = "liquid",
   forceActive = false,
   specularOpacity: specularOpacityProp = 0.4,
@@ -609,9 +624,11 @@ export const MacSlider: React.FC<MacSliderProps> = ({
         ref={containerRef}
         tabIndex={0}
         role="slider"
+        aria-label={label}
         aria-valuemin={min}
         aria-valuemax={max}
-        aria-valuenow={valueMotion.get()}
+        aria-valuenow={controlledValue ?? valueMotion.get()}
+        aria-valuetext={valueText?.(controlledValue ?? valueMotion.get())}
         onKeyDown={handleKeyDown}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
