@@ -3,9 +3,6 @@
 const { createKestrel } = require('../../core');
 const { loadStack } = require('../../core/config');
 
-// JSX + OpenTUI only load under Bun, so the UI is imported lazily (and never by the Node test run).
-const UI_ENTRY = '../../ui/main.jsx';
-
 function checkEnvironment(io) {
     if (!process.versions.bun) {
         return 'The interactive UI needs the Kestrel binary (or Bun ≥ 1.3).\nHeadless snapshot instead: kestrel sm --dump\n';
@@ -39,7 +36,10 @@ async function runUi(mode, parsed, io, stack = undefined) {
     // NODE_ENV must be decided at PROCESS START, never here: Bun picks the JSX transform (jsx vs
     // jsxDEV) at startup, so flipping React to production mid-run crashes with "jsxDEV is not a
     // function" (found in M2). `npm start` and the release build set NODE_ENV=production up front.
-    const { runInteractive } = await import(UI_ENTRY);
+    // A literal specifier, so `bun build --compile` bundles the UI. It is imported lazily: JSX and
+    // OpenTUI only load under Bun, after the checks above (never in the Node test run).
+    // @ts-ignore -- the UI is JSX, outside the type-checked core
+    const { runInteractive } = await import('../../ui/main.jsx');
     return runInteractive({
         kestrel,
         env: { managerAvailable: mode.managerAvailable },
