@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
+import { preload } from 'react-dom';
 import { ScrollMeter } from '@/components/motion/ScrollMeter';
 import { SmoothScroll } from '@/components/motion/SmoothScroll';
 import { Footer } from '@/components/site/Footer';
@@ -25,6 +26,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: '#000000', colorScheme: 'dark' };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
+    // The text face sets the headline (the largest paint), so fetch it with the HTML rather than after the CSS.
+    preload('/fonts/plus-jakarta-sans.woff2', { as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' });
     const search = await searchIndex();
     return (
         <html lang="en" className="dark">

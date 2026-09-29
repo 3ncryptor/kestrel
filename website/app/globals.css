@@ -35,7 +35,7 @@
     --color-primary-foreground: var(--k-base);
     --color-ring: var(--k-mauve);
     --font-mono: "Kestrel Mono", "Kestrel Symbols", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 @font-face {
@@ -49,6 +49,13 @@
     font-family: "Kestrel Mono";
     src: url("/fonts/kestrel-mono-bold.woff2") format("woff2");
     font-weight: 700;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Plus Jakarta Sans";
+    src: url("/fonts/plus-jakarta-sans.woff2") format("woff2");
+    font-weight: 200 800;
     font-display: swap;
 }
 

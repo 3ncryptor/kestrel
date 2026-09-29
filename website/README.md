@@ -35,9 +35,13 @@ bun run build && bun run test:e2e   # Playwright + axe against the production bu
 - **Our own components:** `src/components/site/` has the landing sections and `src/components/docs/` the docs.
   `src/lib/` holds the frame decoder, the markdown pipeline (`docs.ts`, `docs-core.ts`) and the page list with the
   search index (`pages.ts`).
-- **Fonts:** `public/fonts/` holds Kestrel Mono (subset from Cascadia Mono) and Kestrel Symbols (from DejaVu Sans
-  Mono), about 28 KB. They include braille for the CPU graph. `sh scripts/subset-fonts.sh` rebuilds them from pinned,
-  checksummed downloads. The licences sit beside the fonts.
+- **Fonts:** `public/fonts/` holds, about 51 KB in all:
+  - Plus Jakarta Sans, the text face (the variable font, every weight in one file);
+  - Kestrel Mono (subset from Cascadia Mono) and Kestrel Symbols (from DejaVu Sans Mono), for the terminal frames.
+    They include braille for the CPU graph.
+
+  `sh scripts/subset-fonts.sh` rebuilds them from pinned, checksummed downloads, byte for byte. The licences sit
+  beside the fonts.
 
 ## Decisions worth knowing
 
