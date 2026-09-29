@@ -22,7 +22,7 @@ Options
 Developer
   kestrel sm --dump [--ticks N]   Print N JSON snapshots and exit (no UI)
 
-Docs: docs/PRD.md · docs/BUILD_PLAN.md · docs/UI_SPEC.md
+Docs: https://github.com/3ncryptor/kestrel  ·  config: https://github.com/3ncryptor/kestrel/blob/main/docs/CONFIG.md
 `;
 
 /** @param {any} _parsed @param {{ stdout: { write: (s: string) => void } }} io */
