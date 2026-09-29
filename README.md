@@ -4,8 +4,10 @@
 
 [![CI](https://github.com/3ncryptor/kestrel/actions/workflows/ci.yml/badge.svg)](https://github.com/3ncryptor/kestrel/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/3ncryptor/kestrel/actions/workflows/codeql.yml/badge.svg)](https://github.com/3ncryptor/kestrel/actions/workflows/codeql.yml)
+[![npm](https://img.shields.io/npm/v/kestrel-tui.svg)](https://www.npmjs.com/package/kestrel-tui)
+[![Release](https://img.shields.io/github/v/release/3ncryptor/kestrel.svg)](https://github.com/3ncryptor/kestrel/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange.svg)
+![Status: preview](https://img.shields.io/badge/status-preview-orange.svg)
 
 Kestrel shows what is using your machine, the way htop and btop do. It also starts and supervises your
 project's processes, the way pm2 or foreman do. Because it does both, it can tell you that *your*
@@ -59,10 +61,35 @@ project's processes, the way pm2 or foreman do. Because it does both, it can tel
 - **Anywhere.** A single binary, with nothing else to install on the machine. It works over SSH, on an
   EC2 box or a Raspberry Pi, and in 16-colour and no-colour terminals.
 
-## Getting started
+## Install
 
-> Kestrel isn't released yet: the binaries, installer, npm and Homebrew packages are prepared in this
-> repository but not published. Until then, run it from source.
+macOS and Linux, on arm64 and x64. Either way you get one standalone binary; nothing else is needed on
+the machine.
+
+```sh
+npm install -g kestrel-tui
+```
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/3ncryptor/kestrel/main/packaging/install.sh | sh
+```
+
+The npm package runs no install scripts: npm picks the binary for your platform through an optional
+dependency. The installer puts `kestrel` in `~/.local/bin` (set `KESTREL_INSTALL_DIR` to change it)
+and refuses an archive whose SHA-256 doesn't match the release's `SHA256SUMS`. You can also download an
+archive from the [releases page](https://github.com/3ncryptor/kestrel/releases/latest).
+
+Every release is built in GitHub Actions from a tagged commit, with provenance you can check:
+
+```sh
+npm audit signatures                                   # in a project that depends on kestrel-tui
+gh attestation verify kestrel-v0.1.0-darwin-arm64.tar.gz --repo 3ncryptor/kestrel
+```
+
+Then run `kestrel` for the dashboard, or `kestrel pm` in a project folder. `kestrel doctor` checks the
+machine if something looks wrong.
+
+### From source
 
 ```sh
 git clone https://github.com/3ncryptor/kestrel.git && cd kestrel
@@ -75,6 +102,20 @@ linked to your checkout) and verifies everything. `./setup.sh --check` only repo
 full setup runs inside WSL2; Git Bash covers editing, lint and the type check.
 
 ## Commands
+
+### Installed
+
+| Command | What it does |
+|---|---|
+| `kestrel` | The dashboard. This project's stack is shown idle; `a` starts it all, `s` starts one process |
+| `kestrel pm` | Starts this project's stack and opens the dashboard on it (`--only api,web`, `--config path`) |
+| `kestrel sm` | The system monitor only; never reads or runs a config |
+| `kestrel init` | Writes `kestrel.json` from a Procfile, package.json scripts or a command you type |
+| `kestrel import pm2 [file]` | Converts a running pm2 or an ecosystem file into `kestrel.json` |
+| `kestrel doctor` | Checks what Kestrel needs here and says how to fix what is missing |
+| `kestrel update` | Updates a standalone install to the latest release (checksum-verified) |
+
+`-pm`, `--pm`, `-sm` and `--sm` also work.
 
 ### While developing (from a source checkout)
 
@@ -91,28 +132,6 @@ full setup runs inside WSL2; Git Bash covers editing, lint and the type check.
 **npm keeps the flags that come before `--` for itself.** `npm start --pm` opens the plain dashboard,
 because npm took `--pm`. Put Kestrel's flags after `--`: `npm start -- pm --config kestrel.json` or
 `npm run pm -- --only api,web`. The `kestrel` command has no such catch.
-
-### After a release
-
-Planned installs, not published yet:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/3ncryptor/kestrel/main/packaging/install.sh | sh
-npm install -g kestrel-tui
-brew install 3ncryptor/tap/kestrel
-```
-
-| Command | What it does |
-|---|---|
-| `kestrel` | The dashboard. This project's stack is shown idle; `a` starts it all, `s` starts one process |
-| `kestrel pm` | Starts this project's stack and opens the dashboard on it (`--only api,web`, `--config path`) |
-| `kestrel sm` | The system monitor only; never reads or runs a config |
-| `kestrel init` | Writes `kestrel.json` from a Procfile, package.json scripts or a command you type |
-| `kestrel import pm2 [file]` | Converts a running pm2 or an ecosystem file into `kestrel.json` |
-| `kestrel doctor` | Checks what Kestrel needs here and says how to fix what is missing |
-| `kestrel update` | Updates a standalone install to the latest release (checksum-verified) |
-
-`-pm`, `--pm`, `-sm` and `--sm` also work.
 
 ### What the process manager looks like
 
@@ -162,6 +181,7 @@ roadmap to 1% are in [BUILD_PLAN §11](docs/BUILD_PLAN.md#11-quality-testing-and
 | [docs/UI_SPEC.md](docs/UI_SPEC.md) | Layout, keys, colours and every screen state |
 | [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md) | Architecture, the engine/UI contract, performance, distribution |
 | [docs/DEV.md](docs/DEV.md) | Development commands, Linux testing on a Mac, measuring |
+| [RELEASING.md](RELEASING.md) | How a release is built, rehearsed, approved and verified |
 
 ## Contributing
 

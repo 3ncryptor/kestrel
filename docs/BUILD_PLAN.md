@@ -568,8 +568,12 @@ store, system control, config, process manager, stack, composition and actions, 
 end-to-end scripts. Every commit passes its own tests, so the history can be bisected. Later work
 lands as ordinary commits.
 
-Still to set up on GitHub: branch protection for `main`, private vulnerability reporting (SECURITY.md),
-and, when releases start, the `NPM_TOKEN` and tap tokens as **repository secrets**, never in files.
+Releases run from `.github/workflows/release.yml` ([RELEASING.md](../RELEASING.md)): a `v*` tag, a
+`release` environment that needs a maintainer's approval (the only place a publishing credential may
+live, as an environment secret), a `Release tags` ruleset, and npm trusted publishing after the first
+release, so no long-lived npm token exists. v0.1.0 was released on 2026-09-29.
+
+Still to set up on GitHub: branch protection for `main` and private vulnerability reporting (SECURITY.md).
 
 ## 15. Logic ported from the prototype
 
