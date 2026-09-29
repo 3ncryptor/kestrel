@@ -1,0 +1,22 @@
+name: Feature request
+description: An idea for Kestrel
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the problem or workflow first; the solution can come later.
+      placeholder: "I run my stack on an EC2 box and want to know when a process…"
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?
+      description: How you picture it working in Kestrel (a key, a config option, a command…).
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What do you use today?
+      description: Other tools or workarounds (htop, pm2, a script…), and what's missing from them.

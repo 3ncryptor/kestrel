@@ -1,0 +1,52 @@
+name: Bug report
+description: Something in Kestrel doesn't work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Security problems go through the [security policy](https://github.com/3ncryptor/kestrel/security/policy) instead.
+  - type: textarea
+    id: doctor
+    attributes:
+      label: kestrel doctor
+      description: Paste the output of `kestrel doctor`, run in the folder where the problem happens. It shows the version, install method, platform, sampling mode, terminal and config status.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+      placeholder: "`kestrel pm` shows api as `blocked by db` although db is running and ready…"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include the command you ran and, if it's about a stack, a minimal kestrel.json.
+      placeholder: |
+        1. kestrel.json: …
+        2. Run `kestrel pm`
+        3. …
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install Kestrel?
+      options: [From source (bun), Standalone binary, npm, Homebrew, Other]
+    validations:
+      required: true
+  - type: input
+    id: terminal
+    attributes:
+      label: Terminal
+      placeholder: "iTerm2 3.5 over SSH, tmux 3.4"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: For a managed process, `.kestrel/logs/<name>.log` often explains what happened. Remove secrets first.
+      render: text
