@@ -8,9 +8,13 @@ export function gradientLevel(pct) {
 }
 
 const DOTS_PER_ROW = 4;
-// Braille dot bits for one column, bottom to top (U+2800 block).
+// Braille dots for one column, bottom to top (U+2800 block), as masks for "the lowest n dots": the
+// graph redraws every tick, and building each mask per cell (slice + reduce) was its main cost.
 const LEFT_BITS = [0x40, 0x04, 0x02, 0x01];
 const RIGHT_BITS = [0x80, 0x20, 0x10, 0x08];
+const lowestDots = (bits) => [0, 1, 2, 3, 4].map((n) => bits.slice(0, n).reduce((a, b) => a | b, 0));
+const LEFT_MASKS = lowestDots(LEFT_BITS);
+const RIGHT_MASKS = lowestDots(RIGHT_BITS);
 const BRAILLE_BASE = 0x2800;
 
 const clampPct = (v) => Math.min(100, Math.max(0, v || 0));
@@ -20,20 +24,23 @@ const clampPct = (v) => Math.min(100, Math.max(0, v || 0));
  * levels per row, filled from the bottom. Returns `height` strings, top row first.
  */
 export function brailleGraph(values, width, height) {
-    const samples = values.slice(-width * 2);
-    const padded = [...new Array(width * 2 - samples.length).fill(0), ...samples];
-    const levels = padded.map((v) => Math.round((clampPct(v) / 100) * height * DOTS_PER_ROW));
+    const count = width * 2;
+    const offset = count - Math.min(count, values.length); // missing history reads as 0 on the left
+    const start = values.length - (count - offset);
+    const levels = new Array(count);
+    for (let i = 0; i < count; i++) {
+        levels[i] = i < offset ? 0 : Math.round((clampPct(values[start + i - offset]) / 100) * height * DOTS_PER_ROW);
+    }
     const rows = [];
+    const codes = new Array(width);
     for (let r = 0; r < height; r++) {
         const below = (height - 1 - r) * DOTS_PER_ROW;
-        let line = '';
         for (let c = 0; c < width; c++) {
-            const fill = (level) => Math.min(DOTS_PER_ROW, Math.max(0, level - below));
-            const bits = LEFT_BITS.slice(0, fill(levels[c * 2])).reduce((a, b) => a | b, 0)
-                | RIGHT_BITS.slice(0, fill(levels[c * 2 + 1])).reduce((a, b) => a | b, 0);
-            line += String.fromCharCode(BRAILLE_BASE + bits);
+            const left = Math.min(DOTS_PER_ROW, Math.max(0, levels[c * 2] - below));
+            const right = Math.min(DOTS_PER_ROW, Math.max(0, levels[c * 2 + 1] - below));
+            codes[c] = BRAILLE_BASE + (LEFT_MASKS[left] | RIGHT_MASKS[right]);
         }
-        rows.push(line);
+        rows.push(String.fromCharCode(...codes));
     }
     return rows;
 }
