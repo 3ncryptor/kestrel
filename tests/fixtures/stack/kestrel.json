@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "processes": {
+    "db": {
+      "cmd": "node ../../../scripts/fixture-server.js --tcp 4610 --delay 800 --tick 3000",
+      "ready": { "port": 4610 }
+    },
+    "api": {
+      "cmd": "node ../../../scripts/fixture-server.js --http 4611 --delay 500 --tick 1500 --warn-every 5 --echo-env DEMO_TOKEN,LOG_LEVEL",
+      "dependsOn": ["db"],
+      "env": { "LOG_LEVEL": "debug" },
+      "ready": { "http": "http://127.0.0.1:4611/health" }
+    },
+    "worker": {
+      "cmd": "node ../../../scripts/fixture-server.js --delay 300 --ready-line \"worker ready\" --tick 1000",
+      "dependsOn": ["api"],
+      "ready": { "log": "worker ready" }
+    },
+    "flaky": {
+      "cmd": "node ../../../scripts/fixture-server.js --tick 700 --exit-after 6000 --exit-code 1",
+      "maxRestarts": 3
+    }
+  }
+}
