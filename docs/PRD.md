@@ -225,3 +225,5 @@ Priority: **P0** is needed for v1 to ship, **P1** is planned for v1 and can slip
 | 2026-09-29 | Managed is a **box** on the dashboard; **its logs take the big panel** while it has focus | M3 plan: one familiar screen instead of a separate Manager screen; logs need the width |
 | 2026-09-29 | Plain `kestrel` shows the stack **idle**; `a`/`s` start it | M3 plan: opening the dashboard must never start things by surprise |
 | 2026-09-29 | After a hard crash the stack **waits for the orphan question** before starting | Found in M3 E2E testing: a new db would race the left-over one for its port |
+| 2026-09-29 | **Ship first.** The < 1% CPU target is deferred: CI guards against regressions (4%), and 1% is the next optimisation goal | Measured 3.1–3.4% for the dashboard after the native sampler, which is fine to leave running. Installable packages matter more now |
+| 2026-09-29 | Other users' processes on macOS refresh every 5 s (a trimmed `ps`); your own processes refresh every second, natively | macOS only exposes CPU/memory of other users' processes to root (`ps` is setuid) |

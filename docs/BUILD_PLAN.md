@@ -422,7 +422,9 @@ A tick is skipped if the previous one is still running (the existing `inFlight` 
 | Types | `tsc --noEmit` with `checkJs` over core, cli, and ui | CI gate |
 | Coverage | **≥ 80%** on `core/` and `cli/` | `--experimental-test-coverage` |
 
-**Performance budgets** (`scripts/bench.js`, run in CI; the release fails if a budget is exceeded):
+**Performance targets** (`scripts/bench.js`, run in CI). Every report shows the targets. Since the
+2026-09-29 ship-first decision, CI fails only above a **regression guard** (4% CPU, 120 MB), and the
+< 1% target is the next optimisation goal (§11.3):
 
 | Metric | Budget |
 |---|---|
@@ -459,6 +461,26 @@ native calls through Bun's FFI: `libproc` (`proc_listpids`/`proc_pidinfo`) on ma
 
 What is left is the UI redrawing the whole dashboard 4–5 times a second while logs stream. The next step,
 together with the M4 native sampling, is memoizing the boxes so a log update only redraws the logs panel.
+
+### 11.3 Measured in the M4 optimisation pass (2026-09-29)
+
+**The earlier numbers missed the processes Kestrel spawns.** `process.cpuUsage()` and `ps -o time` only
+see Kestrel itself, while most of the cost was in `ps`/`lsof` children. `scripts/bench.js` now measures
+the whole tree.
+
+| What | Before | After | Change |
+|---|---|---|---|
+| Engine, macOS, 574 processes (children included) | 7.09% | **1.45–2.08%** | libproc via Bun FFI instead of spawning `ps`/`vm_stat`/`sysctl`/`lsof`; the trimmed `ps` for other users' processes every 5 s costs ~0.35% |
+| Engine, Linux container, 600 processes | 24.4% | **2.7%** | Only `/proc/<pid>/stat` read per tick, synchronously; identity cached per process; `/proc/stat` instead of `os.cpus()`; `ss` probed once; socket owners cached |
+| Selectors, 571 processes, table view | 0.92 ms/tick | **0.31 ms** | Linear child index (it was quadratic per parent), single-pass top 5 |
+| Dashboard (`kestrel sm`), macOS, in a PTY | ~7–8% | **3.1–3.4%**, ~80 MB | The above; the UI itself is ~1% |
+
+**What limits the rest:** a native sample costs ~2 ms in a tight loop but ~6–7 ms when it runs once a
+second. Just waking up and listing pids costs ~3.6 ms (user + kernel), and a full native pass adds only
+~0.2 ms to that. Apple Silicon runs a mostly idle process on an efficiency core, and caches are cold.
+Tried and dropped, because they gave no measurable gain: caching FFI pointers, and skipping per-tick
+calls for other users' processes. Getting under 1% therefore needs structural changes (for example
+sampling less while nothing is on screen, or a longer default interval), not micro-optimisations.
 
 ## 12. Milestones
 
