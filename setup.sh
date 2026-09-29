@@ -193,7 +193,7 @@ if [ "$PLATFORM" = gitbash ]; then
 elif has node && [ "$(node -p 'process.versions.node.split(".")[0]')" -ge "$NODE_MIN" ]; then
     printf '    running the test suites (about a minute)…\n'
     verify "core and CLI tests (Node)" "npm test" node --test --test-timeout=20000 tests/unit/*.test.js tests/integration/*.test.js
-    verify "UI tests (Bun)" "npm run test:ui" bun test tests/ui
+    verify "UI tests (Bun)" "npm run test:ui" bun test ./tests/ui
 else
     note "tests skipped: they need Node $NODE_MIN+"
 fi
