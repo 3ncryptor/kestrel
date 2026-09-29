@@ -45,7 +45,7 @@ async function setup(t, overrides = {}) {
         def('api', fixture(`--http ${apiPort} --delay 60`), { dependsOn: ['db'], ready: { kind: 'http', target: `http://127.0.0.1:${apiPort}/health`, timeoutMs: 5000 } }),
         def('worker', fixture('--ready-line "worker ready"'), { dependsOn: ['api'], ready: { kind: 'log', target: 'worker ready', timeoutMs: 5000 } }),
     ].map((d) => ({ ...d, ...(overrides[d.name] || {}) }));
-    defs.forEach((d) => pm.register(d));
+    for (const d of defs) pm.register(d);
     const orchestrator = createOrchestrator({ pm, store, names: defs.map((d) => d.name) });
     t.after(() => orchestrator.stopStack().then(() => pm.shutdown()));
     return { store, pm, orchestrator };

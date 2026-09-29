@@ -17,15 +17,27 @@ function setup() {
         getNice: (pid) => (pid === 812 ? 5 : null),
     };
     const processManager = {
-        spawnManaged: (cmd, opts) => (calls.push(['spawn', cmd, opts.id]), { id: opts.id }),
+        spawnManaged: (cmd, opts) => {
+            calls.push(['spawn', cmd, opts.id]);
+            return { id: opts.id };
+        },
         killManaged: async (id) => calls.push(['stop', id]),
-        restartManaged: async (id) => (calls.push(['restart', id]), { id }),
-        start: async (id) => (calls.push(['start', id]), { id }),
+        restartManaged: async (id) => {
+            calls.push(['restart', id]);
+            return { id };
+        },
+        start: async (id) => {
+            calls.push(['start', id]);
+            return { id };
+        },
         getLogs: (id, opts) => ({ lines: [{ text: `${id}:${opts.filter || ''}` }], total: 1 }),
         getEnv: () => ({ SECRET: 's3cret' }),
     };
     const session = {
-        startStack: async (options) => (calls.push(['startStack', options]), { started: [], failed: [], blocked: [] }),
+        startStack: async (options) => {
+            calls.push(['startStack', options]);
+            return { started: [], failed: [], blocked: [] };
+        },
         stopStack: async () => calls.push(['stopStack']),
         adoptScripts: async (names, options) => calls.push(['adoptScripts', names, options]),
         saveAdHoc: (id) => {
@@ -33,7 +45,10 @@ function setup() {
             if (id === 'nope') throw new Error('This stack comes from Procfile');
             return { path: '/p/kestrel.json' };
         },
-        stopOrphans: async () => (calls.push(['stopOrphans']), { stopped: 2 }),
+        stopOrphans: async () => {
+            calls.push(['stopOrphans']);
+            return { stopped: 2 };
+        },
         dismissOrphans: () => calls.push(['dismissOrphans']),
     };
     const actions = createActions({

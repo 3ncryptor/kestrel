@@ -25,9 +25,18 @@ function fakeNative() {
             const p = others[pid] || own[pid];
             return p ? { ppid: p.ppid, uid: p.uid, status: p.status } : null;
         },
-        comm: (pid) => (calls.comm = (calls.comm || 0) + 1, (others[pid] || own[pid])?.comm ?? null),
-        path: (pid) => (calls.path.push(pid), { 1: '/sbin/launchd', 88: '/System/WindowServer', 100: '/usr/local/bin/node', 200: '/opt/esbuild' }[pid] || null),
-        userName: (uid) => (calls.userName.push(uid), { 0: 'root', 88: '_windowserver', 501: 'alice' }[uid] || null),
+        comm: (pid) => {
+            calls.comm = (calls.comm || 0) + 1;
+            return (others[pid] || own[pid])?.comm ?? null;
+        },
+        path: (pid) => {
+            calls.path.push(pid);
+            return { 1: '/sbin/launchd', 88: '/System/WindowServer', 100: '/usr/local/bin/node', 200: '/opt/esbuild' }[pid] || null;
+        },
+        userName: (uid) => {
+            calls.userName.push(uid);
+            return { 0: 'root', 88: '_windowserver', 501: 'alice' }[uid] || null;
+        },
         vmStats: () => ({ pageSize: 16384, free: 1000, active: 2000, inactive: 1500, wire: 3000, speculative: 100, purgeable: 200, compressor: 400, external: 5000, internal: 7000 }),
         swapUsage: () => ({ totalBytes: 2 * 1024 ** 3, usedBytes: 512 * 1024 ** 2 }),
         listeningSockets: (pid) => ({

@@ -10,7 +10,7 @@ const system = (extra = {}) => ({ cpuPercent: 40, cores: [40], load: [1, 1, 1], 
 
 function recordEvents(store, names) {
     const seen = [];
-    names.forEach((n) => store.on(n, (payload) => seen.push([n, payload])));
+    for (const n of names) store.on(n, (payload) => seen.push([n, payload]));
     return seen;
 }
 

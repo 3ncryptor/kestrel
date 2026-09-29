@@ -24,11 +24,11 @@ function probeWith(ready, overrides = {}) {
         intervalMs: 20,
         onReady: (info) => {
             result.ready = info;
-            events.filter(([n]) => n === 'ready').forEach(([, r]) => r(info));
+            for (const [, r] of events.filter(([n]) => n === 'ready')) r(info);
         },
         onTimeout: () => {
             result.timeout = true;
-            events.filter(([n]) => n === 'timeout').forEach(([, r]) => r());
+            for (const [, r] of events.filter(([n]) => n === 'timeout')) r();
         },
         ...overrides,
     });

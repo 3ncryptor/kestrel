@@ -115,7 +115,10 @@ test('per tick only stat is re-read: identity (user, command) is read once per p
         const fs = require('node:fs');
         const path = require('node:path');
         const reads = [];
-        const readText = (file, max) => (reads.push(path.relative(procRoot, file)), linux.readProcText(file, max));
+        const readText = (file, max) => {
+            reads.push(path.relative(procRoot, file));
+            return linux.readProcText(file, max);
+        };
         const adapter = linux.createLinuxAdapter({ procRoot, etcRoot, clockTicks: CLK, pageSize: PAGE, readText });
         await adapter.listProcesses();
         reads.length = 0;
@@ -219,7 +222,13 @@ test('a missing ss is detected once, and socket owners are not rescanned while n
         };
         const real = require('node:fs/promises');
         let readlinks = 0;
-        const fs = { ...real, readlink: (...a) => ((readlinks += 1), real.readlink(...a)) };
+        const fs = {
+            ...real,
+            readlink: (...a) => {
+                readlinks += 1;
+                return real.readlink(...a);
+            },
+        };
         const adapter = linux.createLinuxAdapter({ procRoot, etcRoot, fs, exec, isRoot: true, clockTicks: CLK, pageSize: PAGE });
         await adapter.listeningPorts();
         const scanned = readlinks;

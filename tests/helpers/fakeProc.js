@@ -36,7 +36,7 @@ function createFakeRoot(spec) {
         fs.writeFileSync(path.join(dir, 'stat'), statLine(p));
         fs.writeFileSync(path.join(dir, 'status'), statusText(p));
         fs.writeFileSync(path.join(dir, 'cmdline'), p.cmdline ? `${p.cmdline.join('\0')}\0` : '');
-        (p.sockets || []).forEach((inode, i) => fs.symlinkSync(`socket:[${inode}]`, path.join(dir, 'fd', String(10 + i))));
+        for (const [i, inode] of (p.sockets || []).entries()) fs.symlinkSync(`socket:[${inode}]`, path.join(dir, 'fd', String(10 + i)));
     }
 
     fs.writeFileSync(path.join(proc, 'stat'), `cpu  100 0 100 800 0 0 0 0 0 0\nbtime ${BOOT_TIME_SEC}\n`);

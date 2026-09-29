@@ -99,7 +99,10 @@ function fakePlatform(overrides = {}) {
     let idle = 0;
     return {
         id: 'darwin',
-        cpuTimes: () => [core(0, (idle += 100))],
+        cpuTimes: () => {
+            idle += 100;
+            return [core(0, idle)];
+        },
         loadAverage: () => [1, 2, 3],
         listProcesses: async () => [{ ...baseProc, pid: 7, rssKB: 1024, cpuPercent: 1 }],
         memory: async () => ({ totalMB: 1000, usedMB: 500, swapUsedMB: 0 }),
@@ -199,7 +202,14 @@ test('overlapping ticks are skipped while one is in flight', async () => {
 
 test('start() ticks immediately and schedules; stop() cancels', async () => {
     const scheduled = [];
-    const clock = { now: () => 0, setInterval: (fn, ms) => scheduled.push(ms) && 'timer', clearInterval: (t) => scheduled.push(`clear:${t}`) };
+    const clock = {
+        now: () => 0,
+        setInterval: (_fn, ms) => {
+            scheduled.push(ms);
+            return 'timer';
+        },
+        clearInterval: (t) => scheduled.push(`clear:${t}`),
+    };
     const sink = fakeSink();
     const sampler = createSampler({ platform: fakePlatform(), sink, clock, intervalMs: 250, uptime: () => 0 });
     sampler.start();
@@ -212,7 +222,14 @@ test('start() ticks immediately and schedules; stop() cancels', async () => {
 
 test('an explicitly undefined interval falls back to the default (regression: it meant setInterval(fn, undefined) ≈ 1 ms)', () => {
     const scheduled = [];
-    const clock = { now: () => 0, setInterval: (fn, ms) => (scheduled.push(ms), 'timer'), clearInterval: () => {} };
+    const clock = {
+        now: () => 0,
+        setInterval: (_fn, ms) => {
+            scheduled.push(ms);
+            return 'timer';
+        },
+        clearInterval: () => {},
+    };
     const sampler = createSampler({ platform: fakePlatform(), sink: fakeSink(), clock, uptime: () => 0, intervalMs: undefined, portsSlowMs: undefined });
     sampler.start();
     sampler.stop();

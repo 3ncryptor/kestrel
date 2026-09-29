@@ -66,14 +66,20 @@ function fakeEngine(store, { logs, envs, calls }) {
             calls.push(['adoptScripts', names, options]);
             return { started: names, failed: [], blocked: [] };
         },
-        saveAdHoc: (id) => (calls.push(['saveAdHoc', id]), { path: '/work/app/kestrel.json' }),
+        saveAdHoc: (id) => {
+            calls.push(['saveAdHoc', id]);
+            return { path: '/work/app/kestrel.json' };
+        },
         stopOrphans: async () => {
             calls.push(['stopOrphans']);
             const stopped = store.getState().orphans.length;
             store.setOrphans([]);
             return { stopped };
         },
-        dismissOrphans: () => (calls.push(['dismissOrphans']), store.setOrphans([])),
+        dismissOrphans: () => {
+            calls.push(['dismissOrphans']);
+            return store.setOrphans([]);
+        },
     };
     return { processManager, session };
 }
@@ -99,7 +105,7 @@ export async function setup({
         getNice: () => 0,
     };
     if (stack) store.setStack(stack);
-    managed.forEach((m) => store.upsertManaged(m));
+    for (const m of managed) store.upsertManaged(m);
     if (orphans.length) store.setOrphans(orphans);
     const calls = [];
     const { processManager, session } = fakeEngine(store, { logs, envs, calls });

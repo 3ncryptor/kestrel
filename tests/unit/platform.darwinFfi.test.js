@@ -40,8 +40,13 @@ onMac('it finds the same listening TCP sockets as lsof', async () => {
     try {
         const { port } = server.address();
         assert.deepEqual(native.listeningSockets(process.pid), [{ port, address: '127.0.0.1' }]);
-        const lsof = new Set(sh('lsof', ['-nP', '-iTCP', '-sTCP:LISTEN', '-Fpn']).split('\n')
-            .reduce((acc, line) => (line[0] === 'p' ? { ...acc, pid: line.slice(1) } : line[0] === 'n' ? { ...acc, out: [...acc.out, `${acc.pid}:${line.slice(1).split(':').pop()}`] } : acc), { pid: '', out: [] }).out);
+        // lsof -F: a `p<pid>` line starts a process, each `n<addr:port>` line is one of its sockets.
+        const lsof = new Set();
+        let owner = '';
+        for (const line of sh('lsof', ['-nP', '-iTCP', '-sTCP:LISTEN', '-Fpn']).split('\n')) {
+            if (line[0] === 'p') owner = line.slice(1);
+            else if (line[0] === 'n') lsof.add(`${owner}:${line.slice(1).split(':').pop()}`);
+        }
         const ours = new Set(native.listPids().flatMap((pid) => native.listeningSockets(pid).map((s) => `${pid}:${s.port}`)));
         const missing = [...lsof].filter((key) => !ours.has(key));
         assert.deepEqual(missing, [], 'every socket lsof lists is found natively');

@@ -188,7 +188,11 @@ test('importPm2 with an explicit file skips pm2 jlist', async (t) => {
     const file = path.join(dir, 'custom.json');
     fs.writeFileSync(file, JSON.stringify({ apps: [{ name: 'c', script: 'c.js' }] }));
     let called = false;
-    const result = await pm2.importPm2({ cwd: dir, file, exec: async () => ((called = true), { stdout: '[]' }), confirm: async () => true });
+    const exec = async () => {
+        called = true;
+        return { stdout: '[]' };
+    };
+    const result = await pm2.importPm2({ cwd: dir, file, exec, confirm: async () => true });
     assert.equal(called, false);
     assert.ok(result.config.processes.c);
 });
