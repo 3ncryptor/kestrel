@@ -42,6 +42,10 @@ docs-only change runs no jobs at all. See the table in CONTRIBUTING.md. To test 
 run the workflow by hand (Actions → CI → Run workflow). CodeQL skips docs-only changes and Scorecard
 runs weekly.
 
+Releases have their own workflow, `.github/workflows/release.yml`; see [RELEASING.md](../RELEASING.md).
+To rehearse the npm part on your machine (Node 22+), with tarballs from a release run's `release`
+artifact: `sh scripts/npm-rehearse.sh <dir>/npm`. It uses a throwaway local registry, never npmjs.com.
+
 ## End to end, in a real terminal
 
 ```sh

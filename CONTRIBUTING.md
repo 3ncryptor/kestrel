@@ -106,6 +106,7 @@ single required check.
 - Keep commits small and self-contained; each should pass the test suites on its own.
 - Pull requests use the template: what changed, how it was tested, and whether docs or the contract
   changed.
+- Releases are cut by maintainers from a tag; [RELEASING.md](RELEASING.md) has the steps.
 
 ## Licence
 
