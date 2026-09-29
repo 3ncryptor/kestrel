@@ -1,6 +1,13 @@
-# Lint, type-check and test on macOS and Linux, run the real-terminal end-to-end check, test inside
-# Debian and Amazon Linux, and build the standalone binary for every release target. Nothing here
-# publishes anything: build outputs are only kept as workflow artifacts.
+# CI runs only what a change can affect. The first job reads the diff and decides (the rules live in
+# scripts/ci-changes.sh and are unit-tested in tests/unit/ci-changes.test.js):
+#   docs only (Markdown, docs/, templates) → nothing but the final "CI result" check
+#   code                                   → lint, types, tests and the terminal E2E on Linux
+#   platform or process code               → also macOS, and Debian + Amazon Linux containers
+#   setup files or dependencies            → also the developer setup on Linux, macOS and Windows
+#   engine code                            → also the CPU regression guard
+#   build tooling (or any code on main)    → the standalone binaries for all four targets
+# Pushes to main also run macOS as a safety net. "CI result" is the one check to require in branch
+# protection: skipped jobs count as passed there. Nothing here publishes anything.
 name: CI
 
 on:
@@ -21,8 +28,41 @@ env:
   NODE_VERSION: 20
 
 jobs:
+  changes:
+    name: What changed
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+      platform: ${{ steps.diff.outputs.platform }}
+      setup: ${{ steps.diff.outputs.setup }}
+      engine: ${{ steps.diff.outputs.engine }}
+      build: ${{ steps.diff.outputs.build }}
+      test-os: ${{ steps.diff.outputs.test-os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - id: diff
+        name: Classify the changed files
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.sha }}
+        run: |
+          if [ "$EVENT" = workflow_dispatch ] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            # A manual run, a new branch or a force push: test everything.
+            ALL=true sh scripts/ci-changes.sh < /dev/null > decision.txt
+          else
+            git diff --name-only "$BASE" "$HEAD" | sh scripts/ci-changes.sh > decision.txt
+          fi
+          cat decision.txt >> "$GITHUB_OUTPUT"
+          { echo '### What this change runs'; echo '```'; cat decision.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
   lint:
     name: Lint, types, shellcheck
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -31,17 +71,19 @@ jobs:
         with:
           bun-version: ${{ env.BUN_VERSION }}
       - run: bun install --frozen-lockfile
-      - run: npm run lint
-      - run: npm run typecheck
+      - run: bun run lint
+      - run: bun run typecheck
       - name: shellcheck
         run: shellcheck -s sh setup.sh .husky/pre-commit packaging/install.sh scripts/*.sh scripts/e2e/*.sh
 
   test:
-    name: Tests (${{ matrix.os }})
+    name: Tests and E2E (${{ matrix.os }})
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15]
+        os: ${{ fromJSON(needs.changes.outputs.test-os) }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
@@ -53,38 +95,30 @@ jobs:
         with:
           bun-version: ${{ env.BUN_VERSION }}
       - run: bun install --frozen-lockfile
-      - name: Core and CLI under Node
-        run: npm test
+      - name: Core and CLI under Node (with coverage on Linux)
+        run: ${{ runner.os == 'Linux' && 'npm run test:coverage 2>&1 | tail -80' || 'npm test' }}
       - name: Core and CLI under Bun (includes the native macOS sampler checks)
-        run: npm run test:bun
+        run: bun run test:bun
       - name: UI frame tests
-        run: npm run test:ui
-      - name: Coverage report
-        if: runner.os == 'Linux'
-        run: npm run test:coverage 2>&1 | tail -60
+        run: bun run test:ui
+      - name: kestrel pm on the demo stack in a real pseudo-terminal
+        run: sh scripts/e2e/pm-e2e.sh
 
-  e2e:
-    name: Real-terminal E2E (${{ matrix.os }})
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-24.04, macos-15]
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 10
+  linux-distros:
+    name: Debian 12 and Amazon Linux 2023
+    needs: changes
+    if: needs.changes.outputs.platform == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
-      - run: bun install --frozen-lockfile
-      - name: kestrel pm on the demo stack in a pseudo-terminal
-        run: sh scripts/e2e/pm-e2e.sh
+      - name: Test suite and a live snapshot in containers
+        run: sh scripts/docker-test.sh
 
   setup:
     name: Developer setup (${{ matrix.os }})
+    needs: changes
+    if: needs.changes.outputs.setup == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -105,17 +139,24 @@ jobs:
         shell: pwsh
         run: ./setup.ps1 -Yes
 
-  linux-distros:
-    name: Debian 12 and Amazon Linux 2023
+  bench:
+    name: Engine CPU regression guard
+    needs: changes
+    if: needs.changes.outputs.engine == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Test suite and a live snapshot in containers
-        run: sh scripts/docker-test.sh
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: scripts/bench.js (fails above the regression guard, reports the 1% target)
+        run: bun scripts/bench.js 20
 
   build:
     name: Binary (${{ matrix.target }})
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -143,14 +184,16 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
-  bench:
-    name: Engine CPU regression guard
+  result:
+    name: CI result
+    needs: [changes, lint, test, linux-distros, setup, bench, build]
+    if: always()
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
-      - name: scripts/bench.js (fails above the regression guard, reports the 1% target)
-        run: bun scripts/bench.js 20
+      - name: Every job that ran passed (skipped jobs were not needed for this change)
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "job results: $RESULTS"
+          case " $RESULTS " in *" failure "* | *" cancelled "*) exit 1 ;; esac
