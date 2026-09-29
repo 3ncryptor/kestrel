@@ -6,7 +6,7 @@ export const kestrelTheme: ThemeRegistration = {
     type: 'dark',
     colors: { 'editor.background': '#121212', 'editor.foreground': '#cdd6f4' },
     tokenColors: [
-        { scope: ['comment', 'punctuation.definition.comment'], settings: { foreground: '#6c7086', fontStyle: 'italic' } },
+        { scope: ['comment', 'punctuation.definition.comment'], settings: { foreground: '#7f849c', fontStyle: 'italic' } },
         { scope: ['string', 'string.quoted', 'string.unquoted'], settings: { foreground: '#a6e3a1' } },
         { scope: ['constant.numeric', 'constant.language', 'constant.character'], settings: { foreground: '#fab387' } },
         { scope: ['support.type.property-name', 'meta.object-literal.key', 'entity.name.tag', 'meta.mapping.key'], settings: { foreground: '#89b4fa' } },

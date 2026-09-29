@@ -101,9 +101,9 @@ export function HeroPlayer({ initial }: { initial: Frame }) {
                                 value={WIDTHS.indexOf(width)}
                                 onChange={(v) => setWidth(WIDTHS[Math.round(v)] ?? 'standard')}
                             />
-                            <span className="w-16 font-mono text-k-overlay0">{width}</span>
+                            <span className="w-16 font-mono text-k-muted">{width}</span>
                         </div>
-                        <span className="ml-auto flex items-center gap-2 font-mono text-k-overlay0" aria-live="polite">
+                        <span className="ml-auto flex items-center gap-2 font-mono text-k-muted" aria-live="polite">
                             <span className={animating ? 'size-1.5 animate-pulse rounded-full bg-k-green' : 'size-1.5 rounded-full bg-k-overlay0'} />
                             {status}
                             {animating && frames ? ` · ${String(index + 1).padStart(2, '0')}/${frames.length}` : ''}
@@ -123,7 +123,7 @@ export function HeroPlayer({ initial }: { initial: Frame }) {
                     </motion.div>
                 </AnimatePresence>
             </TerminalWindow>
-            <p className="mt-3 text-center font-mono text-k-overlay0 text-xs">
+            <p className="mt-3 text-center font-mono text-k-muted text-xs">
                 Rendered by Kestrel {VERSION} from a scripted 30 seconds. Not a screenshot, not a mock-up.
             </p>
             <p className="sr-only">

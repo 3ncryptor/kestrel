@@ -26,7 +26,7 @@ export default function NotFound() {
                                 <Link href={href as '/'} className="text-k-mauve underline-offset-4 hover:underline">
                                     {href}
                                 </Link>{' '}
-                                <span className="text-k-overlay0"># {label}</span>
+                                <span className="text-k-muted"># {label}</span>
                             </li>
                         ))}
                     </ul>

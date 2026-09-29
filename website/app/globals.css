@@ -21,6 +21,8 @@
     --color-k-blue: var(--k-blue);
     --color-k-lavender: var(--k-lavender);
     --color-k-teal: var(--k-teal);
+    /* Small muted text on the site: Catppuccin overlay1, 5.6:1 on black (overlay0 is 4.3:1, decoration only). */
+    --color-k-muted: #7f849c;
     --font-mono: "Kestrel Mono", "Kestrel Symbols", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }

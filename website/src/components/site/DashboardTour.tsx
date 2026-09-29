@@ -84,12 +84,12 @@ export function DashboardTour({ frame }: { frame: Frame }) {
                             aria-current={i === active ? 'step' : undefined}
                             className={cn(
                                 'w-full rounded-xl border px-5 py-4 text-left transition-all duration-300',
-                                i === active ? 'border-k-mauve/40 bg-k-mauve/[0.07]' : 'border-transparent opacity-55 hover:opacity-90',
+                                i === active ? 'border-k-mauve/40 bg-k-mauve/[0.07]' : 'border-transparent hover:bg-white/[0.03]',
                             )}
                         >
                             <span className="flex items-baseline gap-3">
                                 <span className="font-mono text-k-mauve text-xs">{String(i + 1).padStart(2, '0')}</span>
-                                <span className="font-medium text-k-text">{stop.title}</span>
+                                <span className={cn('font-medium', i === active ? 'text-k-text' : 'text-k-subtext')}>{stop.title}</span>
                             </span>
                             <span className={cn('mt-2 block text-sm leading-relaxed transition-[max-height,opacity] duration-300', i === active ? 'max-h-40 opacity-100' : 'max-h-0 overflow-hidden opacity-0 lg:max-h-40 lg:opacity-100')}>
                                 {stop.body}

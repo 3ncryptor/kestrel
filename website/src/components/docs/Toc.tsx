@@ -23,7 +23,7 @@ export function Toc({ entries }: { entries: TocEntry[] }) {
     if (!entries.length) return null;
     return (
         <nav aria-label="On this page">
-            <p className="mb-3 font-mono text-k-overlay0 text-xs uppercase tracking-[0.18em]">On this page</p>
+            <p className="mb-3 font-mono text-k-muted text-xs uppercase tracking-[0.18em]">On this page</p>
             <ul className="space-y-1 border-white/[0.06] border-l text-sm">
                 {entries.map((e) => (
                     <li key={e.id}>

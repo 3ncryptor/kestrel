@@ -29,6 +29,7 @@ export function TerminalFrame({ frame, className, overlay }: { frame: Frame; cla
         <div className={cn('@container w-full', className)}>
             <div
                 aria-hidden="true"
+                data-terminal-frame=""
                 className="relative select-none font-mono text-k-text leading-[1.2]"
                 style={{ width: `${frame.cols}ch`, fontSize: `min(18px, calc(100cqi / ${frame.cols * CELL_EM}))` }}
             >

@@ -26,7 +26,7 @@ export function DocPage({ href, toc = [], html, children }: { href: DocHref; toc
                 <div className="docs-prose mt-10">{markup ?? children}</div>
                 {markup && <CodeCopy />}
                 <footer className="mt-16 flex flex-wrap items-center justify-between gap-4 border-white/[0.06] border-t pt-6 text-sm">
-                    <a href={`${REPO_BLOB}/${page.source}`} className="text-k-overlay0 transition-colors hover:text-k-text">
+                    <a href={`${REPO_BLOB}/${page.source}`} className="text-k-muted transition-colors hover:text-k-text">
                         Edit this page on GitHub ↗
                     </a>
                     <span className="flex gap-3">

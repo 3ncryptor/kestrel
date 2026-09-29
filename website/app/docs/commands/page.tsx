@@ -48,7 +48,8 @@ export default function Commands() {
             <Rows rows={options} />
             <h2 id="help">kestrel --help</h2>
             <p>This page is built from the real output, captured from the CLI when the site is generated:</p>
-            <pre className="terminal-output">
+            {/* biome-ignore lint/a11y/noNoninteractiveTabindex: it scrolls sideways, so keyboard users must be able to reach it (WCAG 2.1.1) */}
+            <pre className="terminal-output" tabIndex={0}>
                 <code>{cli.help}</code>
             </pre>
         </DocPage>

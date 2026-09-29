@@ -62,7 +62,7 @@ export function InstallCommand({ className }: { className?: string }) {
                         onClick={() => setActive(i)}
                         className={cn(
                             'relative rounded-md px-3 py-1.5 font-mono text-xs transition-colors',
-                            i === active ? 'text-k-text' : 'text-k-overlay0 hover:text-k-subtext',
+                            i === active ? 'text-k-text' : 'text-k-muted hover:text-k-subtext',
                         )}
                     >
                         {i === active && <motion.span layoutId={`${id}-pill`} className="absolute inset-0 rounded-md bg-white/[0.07]" transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }} />}
@@ -79,7 +79,7 @@ export function InstallCommand({ className }: { className?: string }) {
                 <span aria-hidden="true" className="font-mono text-k-mauve text-sm">
                     $
                 </span>
-                <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-k-text text-sm [scrollbar-width:none]">{tab.command}</code>
+                <code className="min-w-0 flex-1 break-all font-mono text-k-text text-sm">{tab.command}</code>
                 <button
                     type="button"
                     onClick={copy}
@@ -107,7 +107,7 @@ export function InstallCommand({ className }: { className?: string }) {
                     </AnimatePresence>
                 </button>
             </div>
-            <p className="mt-2 text-k-overlay0 text-xs">{tab.note}</p>
+            <p className="mt-2 text-k-muted text-xs">{tab.note}</p>
         </div>
     );
 }

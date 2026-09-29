@@ -43,14 +43,14 @@ export function Trust() {
                     <p className="mt-3 flex-1 text-sm leading-relaxed">{item.body}</p>
                     {item.command && (
                         <div className="mt-4 flex items-center gap-2 rounded-lg border border-white/[0.06] bg-k-base py-1.5 pr-1.5 pl-3">
-                            <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-k-subtext text-xs [scrollbar-width:none]">{item.command}</code>
+                            <code className="min-w-0 flex-1 break-all font-mono text-k-subtext text-xs">{item.command}</code>
                             <CopyButton text={item.command} />
                         </div>
                     )}
                 </div>
             ))}
             <p className="text-sm sm:col-span-2">
-                Found a security problem? <a href={LINKS.security} className="text-k-mauve underline-offset-4 hover:underline">Report it privately</a>.
+                Found a security problem? <a href={LINKS.security} className="text-k-mauve underline underline-offset-4">Report it privately</a>.
             </p>
         </div>
     );

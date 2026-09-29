@@ -8,7 +8,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 function Card({ title, sees, misses }: { title: string; sees: string; misses: string }) {
     return (
         <div className="h-full rounded-xl border border-white/10 bg-k-mantle/70 p-6">
-            <p className="font-mono text-k-overlay0 text-sm">{title}</p>
+            <p className="font-mono text-k-muted text-sm">{title}</p>
             <p className="mt-4 text-k-text">{sees}</p>
             <p className="mt-2 text-sm">
                 <span className="text-k-red">✕</span> {misses}
@@ -26,7 +26,7 @@ export function MergeCards() {
 
     return (
         <div ref={ref} className="grid items-stretch gap-4 md:grid-cols-[1fr_1.3fr_1fr]">
-            <motion.div animate={merged && !reduced ? { x: 24, opacity: 0.72, scale: 0.97 } : {}} transition={{ duration: 0.9, ease: EASE }}>
+            <motion.div animate={merged && !reduced ? { x: 24, opacity: 0.9, scale: 0.97 } : {}} transition={{ duration: 0.9, ease: EASE }}>
                 <Card title="htop · btop" sees="Sees every process on the machine." misses="Can’t tell which of them are your project." />
             </motion.div>
             <motion.div
@@ -46,7 +46,7 @@ export function MergeCards() {
                     <li><span className="text-k-green">●</span> CPU and memory summed over each process tree</li>
                 </ul>
             </motion.div>
-            <motion.div animate={merged && !reduced ? { x: -24, opacity: 0.72, scale: 0.97 } : {}} transition={{ duration: 0.9, ease: EASE }}>
+            <motion.div animate={merged && !reduced ? { x: -24, opacity: 0.9, scale: 0.97 } : {}} transition={{ duration: 0.9, ease: EASE }}>
                 <Card title="pm2 · foreman" sees="Runs and restarts your processes." misses="Blind to the rest of the machine." />
             </motion.div>
         </div>

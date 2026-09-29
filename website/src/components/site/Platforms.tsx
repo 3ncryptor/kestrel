@@ -11,7 +11,7 @@ function Cell({ name, pkg }: { name: string; pkg: string }) {
                     <span className="text-k-green">●</span>
                     {name}
                 </span>
-                <span className="mt-1 block font-mono text-k-overlay0 text-xs transition-colors group-hover:text-k-teal">{pkg}</span>
+                <span className="mt-1 block font-mono text-k-muted text-xs transition-colors group-hover:text-k-teal">{pkg}</span>
             </a>
         </td>
     );

@@ -78,7 +78,7 @@ export function StackExplorer() {
     return (
         <div className="grid gap-6 lg:grid-cols-[0.8fr_1.6fr]">
             <div className="rounded-xl border border-white/10 bg-k-mantle/60 p-4">
-                <p className="mb-3 font-mono text-k-overlay0 text-xs">your project</p>
+                <p className="mb-3 font-mono text-k-muted text-xs">your project</p>
                 <TreeView data={TREE} defaultExpandedIds={['myapp', '.kestrel', 'logs']} showLines />
                 <p className="mt-4 text-xs leading-relaxed">
                     Logs are saved per process and rotated at 10 MB. <code className="font-mono">run.json</code> is how Kestrel finds what it left running after a crash.
@@ -124,10 +124,10 @@ export function StackExplorer() {
                     <div className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-k-mantle/60 px-5 py-4 font-mono text-sm" aria-hidden="true">
                         {GRAPH.map((p, i) => (
                             <span key={p} className="flex items-center gap-2">
-                                <span className={cn('rounded-md border px-2 py-1 transition-all duration-300', process === p ? 'border-k-teal/60 bg-k-teal/10 text-k-teal' : 'border-white/10 text-k-overlay0')}>
+                                <span className={cn('rounded-md border px-2 py-1 transition-all duration-300', process === p ? 'border-k-teal/60 bg-k-teal/10 text-k-teal' : 'border-white/10 text-k-muted')}>
                                     ● {p}
                                 </span>
-                                {i < GRAPH.length - 1 && <span className="text-k-overlay0">→</span>}
+                                {i < GRAPH.length - 1 && <span className="text-k-muted">→</span>}
                             </span>
                         ))}
                     </div>

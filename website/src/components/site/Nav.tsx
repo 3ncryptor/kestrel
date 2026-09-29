@@ -51,7 +51,7 @@ export function Nav() {
                         <button
                             type="button"
                             onClick={() => window.dispatchEvent(new Event(OPEN_SEARCH_EVENT))}
-                            className="mr-1 hidden items-center gap-2 rounded-md border border-white/10 px-2.5 py-1 text-k-overlay0 transition-colors hover:border-white/20 hover:text-k-text md:flex"
+                            className="mr-1 hidden items-center gap-2 rounded-md border border-white/10 px-2.5 py-1 text-k-muted transition-colors hover:border-white/20 hover:text-k-text md:flex"
                         >
                             Search
                             <kbd className="rounded border border-white/10 px-1 font-mono text-[10px]">⌘K</kbd>

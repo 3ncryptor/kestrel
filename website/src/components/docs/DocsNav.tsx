@@ -9,7 +9,7 @@ export function DocsNav({ pages }: { pages: ReadonlyArray<{ href: string; title:
     const pathname = usePathname();
     return (
         <nav aria-label="Docs">
-            <p className="mb-3 font-mono text-k-overlay0 text-xs uppercase tracking-[0.18em]">Docs</p>
+            <p className="mb-3 font-mono text-k-muted text-xs uppercase tracking-[0.18em]">Docs</p>
             <ul className="space-y-0.5 text-sm">
                 {pages.map((page) => {
                     const active = pathname === page.href;
@@ -27,7 +27,7 @@ export function DocsNav({ pages }: { pages: ReadonlyArray<{ href: string; title:
                     );
                 })}
             </ul>
-            <p className="mt-6 px-3 text-k-overlay0 text-xs leading-relaxed">
+            <p className="mt-6 px-3 text-k-muted text-xs leading-relaxed">
                 <kbd className="rounded border border-white/10 px-1 font-mono">⌘K</kbd> search ·{' '}
                 <kbd className="rounded border border-white/10 px-1 font-mono">?</kbd> shortcuts
             </p>

@@ -29,7 +29,7 @@ function CoreMeters() {
                 const filled = Math.round(v / 10);
                 return (
                     <div key={id} className="flex items-center gap-2">
-                        <span className="w-6 text-k-overlay0">{id}</span>
+                        <span className="w-6 text-k-muted">{id}</span>
                         <span className={cn('animate-[pulse_3s_ease-in-out_infinite]', colour(v))} style={{ animationDelay: `${delay}s` }}>
                             {'■'.repeat(filled)}
                             <span className="text-k-surface1">{'─'.repeat(10 - filled)}</span>
@@ -62,7 +62,7 @@ function StartOrder() {
                 const state = step > i * 2 + 1 ? 'ready' : step > i * 2 ? 'starting' : 'waiting';
                 return (
                     <li key={p.id} className="flex items-center gap-3">
-                        <span className={cn('w-4 text-center', state === 'ready' ? 'text-k-green' : state === 'starting' ? 'text-k-yellow' : 'text-k-overlay0')}>
+                        <span className={cn('w-4 text-center', state === 'ready' ? 'text-k-green' : state === 'starting' ? 'text-k-yellow' : 'text-k-muted')}>
                             {state === 'ready' ? '●' : state === 'starting' ? '◌' : '○'}
                         </span>
                         <span className="w-14 text-k-text">{p.id}</span>
@@ -91,7 +91,7 @@ function LogSearch() {
                 {LINES.map((line) => {
                     const hit = q && line.toLowerCase().includes(q);
                     return (
-                        <li key={line} className={cn('truncate rounded px-1 transition-colors duration-200', hit ? 'bg-k-yellow/15 text-k-text' : q ? 'text-k-overlay0' : 'text-k-subtext')}>
+                        <li key={line} className={cn('truncate rounded px-1 transition-colors duration-200', hit ? 'bg-k-yellow/15 text-k-text' : q ? 'text-k-muted' : 'text-k-subtext')}>
                             {line}
                         </li>
                     );
@@ -118,7 +118,7 @@ function SafeKill() {
             <p className="text-k-subtext">
                 Kill <span className="text-k-red">WindowServer</span> (pid 402, _windowserver)?
             </p>
-            <label htmlFor={id} className="mt-2 block text-k-overlay0">
+            <label htmlFor={id} className="mt-2 block text-k-muted">
                 Type its name to confirm
             </label>
             <input id={id} value={typed} onChange={(e) => setTyped(e.target.value)} placeholder={TARGET} spellCheck={false} autoComplete="off" className="mt-1 w-full rounded-md border border-white/10 bg-k-base px-2 py-1.5 text-k-text outline-none focus:border-k-red/60" />
@@ -126,7 +126,7 @@ function SafeKill() {
                 type="button"
                 disabled={!armed}
                 onClick={confirm}
-                className={cn('mt-2 w-full rounded-md px-2 py-1.5 transition-all duration-200', armed ? 'bg-k-red text-k-base active:scale-[0.98]' : 'cursor-not-allowed bg-white/[0.04] text-k-overlay0')}
+                className={cn('mt-2 w-full rounded-md px-2 py-1.5 transition-all duration-200', armed ? 'bg-k-red text-k-base active:scale-[0.98]' : 'cursor-not-allowed bg-white/[0.04] text-k-muted')}
             >
                 <AnimatePresence mode="wait" initial={false}>
                     <motion.span key={armed ? 'armed' : 'safe'} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} className="block">

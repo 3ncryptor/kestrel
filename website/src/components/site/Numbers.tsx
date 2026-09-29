@@ -24,7 +24,7 @@ export function Numbers() {
                         <AnimatedCounter value={inView ? n.value : 0} prefix={'prefix' in n ? n.prefix : undefined} suffix={'suffix' in n ? n.suffix : undefined} />
                     </p>
                     <p className="mt-2 text-k-text text-sm">{n.label}</p>
-                    <p className="mt-1 text-k-overlay0 text-xs">{n.note}</p>
+                    <p className="mt-1 text-k-muted text-xs">{n.note}</p>
                 </div>
             ))}
         </div>

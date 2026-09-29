@@ -38,7 +38,7 @@ export function Footer() {
                 <div>
                     <Wordmark />
                     <p className="mt-3 max-w-xs text-sm">{SITE.tagline}</p>
-                    <p className="mt-4 font-mono text-k-overlay0 text-xs">
+                    <p className="mt-4 font-mono text-k-muted text-xs">
                         v{VERSION} · no telemetry · MIT
                     </p>
                 </div>

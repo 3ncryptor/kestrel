@@ -41,7 +41,7 @@ export function TerminalWindow({ title, children, className, footer }: { title: 
                     <span className="size-3 rounded-full bg-[#ff5f57]" />
                     <span className="size-3 rounded-full bg-[#febc2e]" />
                     <span className="size-3 rounded-full bg-[#28c840]" />
-                    <span className="flex-1 text-center font-mono text-k-overlay0 text-xs">{title}</span>
+                    <span className="flex-1 text-center font-mono text-k-muted text-xs">{title}</span>
                     <span className="w-[52px]" />
                 </div>
                 <div className="p-3 sm:p-4">{children}</div>

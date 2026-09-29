@@ -86,6 +86,7 @@ function siteTransform(sourceFile: string, toc: TocEntry[], shiki: Highlighter) 
                 const pre = highlighted.children[0] as Element;
                 pre.properties.dataCode = text;
                 pre.properties.dataLang = lang;
+                pre.properties.tabIndex = 0; // it scrolls, so keyboard users must be able to reach it
                 replacements.push({ parent, index, node: pre });
             }
         });
