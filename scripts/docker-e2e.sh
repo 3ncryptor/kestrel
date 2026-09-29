@@ -10,6 +10,8 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 IMAGES=${KESTREL_TEST_IMAGES:-"node:20-bookworm amazonlinux:2023"}
 BUN_VERSION=${BUN_VERSION:-1.4.0}
 
+# The body runs inside the container, so its $variables must not expand here.
+# shellcheck disable=SC2016
 INNER='
 set -e
 if ! command -v node >/dev/null 2>&1; then
