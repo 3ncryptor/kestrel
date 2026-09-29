@@ -9,5 +9,12 @@
     "enabled": true,
     "rules": { "preset": "recommended" }
   },
+  "overrides": [
+    {
+      // Vendored DevClub UI components render static lists that never reorder, where index keys are fine.
+      "includes": ["src/components/ui/**"],
+      "linter": { "rules": { "suspicious": { "noArrayIndexKey": "off" } } }
+    }
+  ],
   "css": { "parser": { "tailwindDirectives": true } }
 }
