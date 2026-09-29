@@ -18,21 +18,14 @@ function classify(files, { event = 'pull_request', all = false } = {}) {
 
 test('a docs-only change runs nothing', () => {
     assert.deepEqual(classify(['README.md', 'docs/DEV.md', 'CONTRIBUTING.md', '.github/ISSUE_TEMPLATE/bug_report.yml', 'LICENSE']), {
-        code: false, platform: false, setup: false, engine: false, build: false, website: false, 'test-os': ['ubuntu-24.04'],
+        code: false, platform: false, setup: false, engine: false, build: false, 'test-os': ['ubuntu-24.04'],
     });
 });
 
-test('the website runs its own job for its code, the documents it renders and the UI it captures', () => {
-    const site = classify(['website/app/page.tsx', 'website/bun.lock']);
-    assert.deepEqual([site.website, site.code, site.build], [true, false, false], 'a website-only change does not run the product suite');
-    for (const f of ['docs/CONFIG.md', 'CHANGELOG.md', 'packaging/npm/README.md']) {
-        const r = classify([f]);
-        assert.deepEqual([r.website, r.code], [true, false], f);
-    }
-    for (const f of ['ui/components/logs.jsx', 'ui/theme/tokens.js', 'cli/commands/help.js', 'scripts/website/scenario.js', 'package.json']) {
-        assert.equal(classify([f]).website, true, `${f} changes what the site captures`);
-    }
-    assert.equal(classify(['core/store/selectors.js']).website, false);
+test('a website-only change runs no job: CI covers the package, and Vercel builds the site', () => {
+    assert.deepEqual(classify(['website/app/page.tsx', 'website/bun.lock']), {
+        code: false, platform: false, setup: false, engine: false, build: false, 'test-os': ['ubuntu-24.04'],
+    });
 });
 
 test('an OS-independent code change in a pull request tests on Linux only', () => {
@@ -67,6 +60,6 @@ test('pushes to main build the binaries and test on macOS whenever code changed'
 
 test('a change to CI itself, or a manual run, runs everything', () => {
     for (const r of [classify(['.github/workflows/ci.yml']), classify(['scripts/ci-changes.sh']), classify([], { event: 'workflow_dispatch', all: true })]) {
-        assert.deepEqual([r.code, r.platform, r.setup, r.engine, r.build, r.website], [true, true, true, true, true, true]);
+        assert.deepEqual([r.code, r.platform, r.setup, r.engine, r.build], [true, true, true, true, true]);
     }
 });
