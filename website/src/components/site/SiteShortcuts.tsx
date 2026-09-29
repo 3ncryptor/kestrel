@@ -2,8 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { RevealSheet } from '@/components/ui/reveal-sheet';
-import { type SpotlightItem, SpotlightSearch } from '@/components/ui/spotlight-search';
+import { CommandPalette, Panel } from './CommandPalette';
 
 /** The nav's search button fires this, so the button and the ⌘K shortcut open the same dialog. */
 export const OPEN_SEARCH_EVENT = 'kestrel:search';
@@ -23,7 +22,7 @@ const CHORDS: Record<string, string> = { h: '/', d: '/docs', c: '/changelog' };
 const typing = (target: EventTarget | null) => target instanceof HTMLElement && Boolean(target.closest('input, textarea, select, [contenteditable="true"]'));
 
 /** Site-wide keys that echo Kestrel's own: ⌘K or / to search, ? for help, g-chords to move around. */
-export function SiteShortcuts({ items }: { items: SpotlightItem[] }) {
+export function SiteShortcuts() {
     const router = useRouter();
     const [search, setSearch] = useState(false);
     const [help, setHelp] = useState(false);
@@ -61,20 +60,13 @@ export function SiteShortcuts({ items }: { items: SpotlightItem[] }) {
 
     return (
         <>
-            <RevealSheet open={search} onOpenChange={setSearch} side="top" title="Search" description="Pages, sections, commands and keys" showGrid={false}>
-                <SpotlightSearch
-                    items={items}
-                    autoFocus
-                    placeholder="Search the docs"
-                    filterLabels={{ docs: 'Pages', folders: 'Configuration', apps: 'Commands', layers: 'Keys' }}
-                    onSelect={(item) => {
-                        setSearch(false);
-                        router.push((item.id.split('|')[0] ?? '/docs') as Parameters<typeof router.push>[0]);
-                    }}
-                />
-            </RevealSheet>
-            <RevealSheet open={help} onOpenChange={setHelp} side="right" title="Keyboard shortcuts" description="The site answers to keys, like Kestrel does.">
-                <ul className="space-y-3 text-sm">
+            <CommandPalette open={search} onOpenChange={setSearch} />
+            <Panel open={help} onOpenChange={setHelp} title="Keyboard shortcuts">
+                <div className="border-white/[0.06] border-b px-5 py-4">
+                    <p className="font-medium text-k-text">Keyboard shortcuts</p>
+                    <p className="text-k-muted text-sm">The site answers to keys, like Kestrel does.</p>
+                </div>
+                <ul className="space-y-3 px-5 py-4 text-sm">
                     {SHORTCUTS.map((s) => (
                         <li key={s.what} className="flex items-center justify-between gap-6">
                             <span>{s.what}</span>
@@ -88,7 +80,7 @@ export function SiteShortcuts({ items }: { items: SpotlightItem[] }) {
                         </li>
                     ))}
                 </ul>
-            </RevealSheet>
+            </Panel>
         </>
     );
 }

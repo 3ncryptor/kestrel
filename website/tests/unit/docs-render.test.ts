@@ -2,11 +2,11 @@ import { describe, expect, test } from 'vitest';
 import { readRepoFile, renderMarkdown, withoutTitle } from '@/lib/docs';
 
 describe('renderMarkdown', () => {
-    test('headings get ids, anchors and a table of contents', async () => {
+    test('headings get ids, anchors and a table of contents, each with the start of its section for search', async () => {
         const { html, toc } = await renderMarkdown('## Where Kestrel looks\n\ntext\n\n### Readiness\n\nmore\n', 'docs/CONFIG.md');
         expect(toc).toEqual([
-            { id: 'where-kestrel-looks', text: 'Where Kestrel looks', depth: 2 },
-            { id: 'readiness', text: 'Readiness', depth: 3 },
+            { id: 'where-kestrel-looks', text: 'Where Kestrel looks', depth: 2, excerpt: 'text' },
+            { id: 'readiness', text: 'Readiness', depth: 3, excerpt: 'more' },
         ]);
         expect(html).toContain('<h2 id="where-kestrel-looks">');
         expect(html).toContain('href="#readiness"');
@@ -42,5 +42,8 @@ describe('the real documents', () => {
     test('docs/CONFIG.md renders with its sections in the table of contents', async () => {
         const { toc } = await renderMarkdown(withoutTitle(await readRepoFile('docs/CONFIG.md')), 'docs/CONFIG.md');
         expect(toc.map((t) => t.text)).toEqual(expect.arrayContaining(['Where Kestrel looks', 'Processes', 'Readiness', 'Restarts']));
+        // A section is found by what it says: the restarts section explains crashes without "crash" in its title.
+        expect(toc.find((t) => t.text === 'Restarts')?.excerpt).toMatch(/crash/i);
+        expect(toc.every((t) => (t.excerpt ?? '').length <= 280)).toBe(true);
     });
 });

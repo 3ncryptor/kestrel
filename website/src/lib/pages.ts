@@ -1,10 +1,10 @@
 // The docs pages: what each renders from the repository, and the site-wide search index built from them.
 import { cache } from 'react';
-import type { SpotlightItem } from '@/components/ui/spotlight-search';
 import cli from '@/generated/cli.json';
 import keys from '@/generated/keys.json';
 import { readRepoFile, renderMarkdown, withoutTitle } from './docs';
 import { extractSections, parseHelp } from './docs-core';
+import type { Group, SearchItem } from './search';
 
 export const DOC_PAGES = [
     { href: '/docs', title: 'Guide', description: 'Install, run and verify Kestrel, and fix what goes wrong.', source: 'packaging/npm/README.md' },
@@ -33,18 +33,18 @@ export const help = () => parseHelp(cli.help);
 export type KeyGroup = { context: string; title: string; entries: Array<{ keys: string[]; label: string }> };
 export const keyGroups = () => keys as KeyGroup[];
 
-/** Everything ⌘K can find: pages, their sections, commands and keys (the item id is where it goes). */
-export const searchIndex = cache(async (): Promise<SpotlightItem[]> => {
+/** Everything ⌘K can find: pages, their sections (with the start of their text), commands and keys. */
+export const searchIndex = cache(async (): Promise<SearchItem[]> => {
     const [guide, config, changelog] = await Promise.all([guideDoc(), configDoc(), changelogDoc()]);
-    const items: SpotlightItem[] = DOC_PAGES.map((p) => ({ id: p.href, title: p.title, category: 'docs', subtitle: p.description }));
-    const sections = (href: string, page: string, toc: Array<{ id: string; text: string }>, category: SpotlightItem['category']) =>
-        toc.map((t) => ({ id: `${href}#${t.id}`, title: t.text, category, subtitle: page }));
-    items.push(...sections('/docs', 'Guide', guide.toc, 'docs'), ...sections('/docs/config', 'Configuration', config.toc, 'folders'));
-    items.push(...sections('/changelog', 'Changelog', changelog.toc.filter((t) => /^\[?\d/.test(t.text)), 'docs'));
-    items.push(...help().commands.map((c) => ({ id: '/docs/commands#commands', title: c.usage, category: 'apps' as const, subtitle: c.description })));
-    items.push(...help().options.map((o) => ({ id: '/docs/commands#options', title: o.usage, category: 'apps' as const, subtitle: o.description })));
-    for (const group of keyGroups()) {
-        for (const entry of group.entries) items.push({ id: `/docs/keys#${group.context}`, title: entry.label, category: 'layers', subtitle: group.title });
-    }
-    return items.map((item, i) => ({ ...item, id: `${item.id}|${i}` }));
+    const sections = (href: string, page: string, group: Group, toc: Awaited<ReturnType<typeof guideDoc>>['toc']): SearchItem[] =>
+        toc.map((t) => ({ href: `${href}#${t.id}`, title: t.text, group, context: page, excerpt: t.excerpt }));
+    return [
+        ...DOC_PAGES.map((p): SearchItem => ({ href: p.href, title: p.title, group: 'Docs', context: p.description })),
+        ...sections('/docs', 'Guide', 'Docs', guide.toc),
+        ...sections('/docs/config', 'Configuration', 'Configuration', config.toc),
+        ...sections('/changelog', 'Changelog', 'Changelog', changelog.toc.filter((t) => /^\[?\d/.test(t.text))),
+        ...help().commands.map((c): SearchItem => ({ href: '/docs/commands#commands', title: c.usage, group: 'Commands', context: c.description })),
+        ...help().options.map((o): SearchItem => ({ href: '/docs/commands#options', title: o.usage, group: 'Commands', context: o.description })),
+        ...keyGroups().flatMap((g) => g.entries.map((e): SearchItem => ({ href: `/docs/keys#${g.context}`, title: e.label, group: 'Keys', context: `${e.keys.join(' ')} · ${g.title}` }))),
+    ];
 });

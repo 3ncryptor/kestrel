@@ -7,7 +7,6 @@ import { Footer } from '@/components/site/Footer';
 import { Nav } from '@/components/site/Nav';
 import { SiteShortcuts } from '@/components/site/SiteShortcuts';
 import { Toaster } from '@/components/ui/sonner';
-import { searchIndex } from '@/lib/pages';
 import { SITE } from '@/lib/site';
 import './globals.css';
 
@@ -25,10 +24,9 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: '#000000', colorScheme: 'dark' };
 
-export default async function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
     // The text face sets the headline (the largest paint), so fetch it with the HTML rather than after the CSS.
     preload('/fonts/plus-jakarta-sans.woff2', { as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' });
-    const search = await searchIndex();
     return (
         <html lang="en" className="dark">
             <body className="min-h-dvh font-sans">
@@ -42,7 +40,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                 <main id="main">{children}</main>
                 <Footer />
                 <Toaster theme="dark" position="bottom-center" />
-                <SiteShortcuts items={search} />
+                <SiteShortcuts />
                 <SmoothScroll />
                 <ScrollMeter />
             </body>

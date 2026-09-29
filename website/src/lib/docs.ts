@@ -23,7 +23,12 @@ export interface TocEntry {
     id: string;
     text: string;
     depth: 2 | 3;
+    /** The start of the section's text, for search (rendered markdown only; hand-made lists leave it out). */
+    excerpt?: string;
 }
+
+/** How much of each section search sees: enough to find it by what it says, small enough to ship. */
+const EXCERPT_CHARS = 280;
 
 export interface RenderedDoc {
     html: string;
@@ -69,7 +74,7 @@ function siteTransform(sourceFile: string, toc: TocEntry[], shiki: Highlighter) 
             }
             if ((node.tagName === 'h2' || node.tagName === 'h3') && typeof node.properties.id === 'string') {
                 const id = node.properties.id;
-                toc.push({ id, text: hastToString(node), depth: node.tagName === 'h2' ? 2 : 3 });
+                toc.push({ id, text: hastToString(node), depth: node.tagName === 'h2' ? 2 : 3, excerpt: '' });
                 node.children.push(el('a', { href: `#${id}`, className: ['heading-anchor'], ariaLabel: `Link to “${hastToString(node)}”` }, [{ type: 'text', value: '#' }]));
             }
             if (node.tagName === 'table') {
@@ -91,7 +96,24 @@ function siteTransform(sourceFile: string, toc: TocEntry[], shiki: Highlighter) 
             }
         });
         for (const { parent, index, node } of replacements) (parent.children as RootContent[])[index] = node;
+        excerpts(tree, toc);
     };
+}
+
+/** Each section's text: the top-level nodes between its heading and the next one. */
+function excerpts(tree: Root, toc: TocEntry[]) {
+    const byId = new Map(toc.map((entry) => [entry.id, entry]));
+    let current: TocEntry | undefined;
+    for (const child of tree.children) {
+        if (child.type !== 'element') continue;
+        if ((child.tagName === 'h2' || child.tagName === 'h3') && typeof child.properties.id === 'string') {
+            current = byId.get(child.properties.id);
+            continue;
+        }
+        if (current && (current.excerpt ?? '').length < EXCERPT_CHARS) {
+            current.excerpt = `${current.excerpt ?? ''} ${hastToString(child)}`.replace(/\s+/g, ' ').trim().slice(0, EXCERPT_CHARS);
+        }
+    }
 }
 
 /** Markdown from the repository → HTML and a table of contents. `sourceFile` resolves relative links. */
