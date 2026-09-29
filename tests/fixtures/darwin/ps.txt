@@ -1,0 +1,28 @@
+    1     0   0.1   6176 Ss   root             18-08:24:10 /sbin/launchd
+  339     1   0.2   5808 Ss   root             18-08:23:27 /usr/libexec/logd
+  341     1   0.0   5376 Ss   root             18-08:23:27 /usr/libexec/UserEventAgent
+  343     1   0.0   4000 Ss   root             18-08:23:27 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/FSEvents.framework/Versions/A/Support/fseventsd
+  347     1   0.0   3840 Ss   root             18-08:23:27 /usr/sbin/systemstats
+  351     1   0.0   5408 Ss   root             18-08:23:27 /usr/libexec/configd
+  353     1   0.0   6432 Ss   root             18-08:23:27 /System/Library/CoreServices/powerd.bundle/powerd
+  354     1   0.0    384 Ss   root             18-08:23:27 /usr/libexec/IOMFB_bics_daemon
+  358     1   0.0   1488 Ss   root             18-08:23:27 /usr/libexec/remoted
+  362     1   0.0      0 Ss   _corespeechd     18-08:23:27 /System/Library/PrivateFrameworks/CoreSpeech.framework/corespeechd_system
+  364     1   0.0    752 Ss   root             18-08:23:27 /usr/libexec/watchdogd
+  368     1   1.0   9936 Ss   root             18-08:23:27 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mds
+  370     1   0.0   1456 Ss   root             18-08:23:27 /usr/libexec/kernelmanagerd
+  371     1   0.0   3920 Ss   root             18-08:23:27 /usr/libexec/diskarbitrationd
+  375     1   0.0    384 Ss   root             18-08:23:27 /usr/sbin/syslogd
+  377     1   0.0   1648 Ss   root             18-08:23:27 /usr/libexec/thermalmonitord
+  378     1   0.4   5568 Ss   root             18-08:23:27 /System/Library/PrivateFrameworks/CoreDuetContext.framework/Resources/contextstored
+  379     1   0.0   1152 Ss   root             18-08:23:27 /usr/libexec/xprotectd
+  380     1   0.7   6688 Ss   root             18-08:23:27 /usr/libexec/opendirectoryd
+  381     1   0.0   4608 Ss   root             18-08:23:27 /System/Library/PrivateFrameworks/ApplePushService.framework/apsd
+  382     1   0.0   3184 Ss   root             18-08:23:27 /System/Library/CoreServices/launchservicesd
+  383     1   0.0   2032 Ss   _timed           18-08:23:27 /usr/libexec/timed
+  384     1   0.0    336 Ss   _usbmuxd         18-08:23:27 /System/Library/PrivateFrameworks/MobileDevice.framework/Versions/A/Resources/usbmuxd
+  385     1   0.0   2736 Ss   root             18-08:23:27 /usr/sbin/securityd
+  387     1   0.0   6800 Ss   _locationd       18-08:23:27 /usr/libexec/locationd
+  415     1   0.0   6816 Ss   alice     18-08:23:26 /System/Library/CoreServices/loginwindow.app/Contents/MacOS/loginwindow
+  545     1   0.0  13232 Ss   root             18-08:23:25 /Applications/Cloudflare WARP.app/Contents/Resources/CloudflareWARP
+  570     1   0.0   2832 Ss   root             18-08:23:25 /System/Library/CoreServices/Software Update.app/Contents/Resources/suhelperd
