@@ -1,0 +1,102 @@
+@import "tailwindcss";
+@import "../src/generated/tokens.css";
+
+/* Kestrel's palette (generated from ui/theme/tokens.js) as Tailwind colours: bg-k-base, text-k-mauve… */
+@theme inline {
+    --color-k-base: var(--k-base);
+    --color-k-mantle: var(--k-mantle);
+    --color-k-surface0: var(--k-surface0);
+    --color-k-surface1: var(--k-surface1);
+    --color-k-overlay0: var(--k-overlay0);
+    --color-k-subtext: var(--k-subtext);
+    --color-k-text: var(--k-text);
+    --color-k-green: var(--k-green);
+    --color-k-yellow: var(--k-yellow);
+    --color-k-peach: var(--k-peach);
+    --color-k-red: var(--k-red);
+    --color-k-mauve: var(--k-mauve);
+    --color-k-blue: var(--k-blue);
+    --color-k-lavender: var(--k-lavender);
+    --color-k-teal: var(--k-teal);
+    --font-mono: "Kestrel Mono", "Kestrel Symbols", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@font-face {
+    font-family: "Kestrel Mono";
+    src: url("/fonts/kestrel-mono-regular.woff2") format("woff2");
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Kestrel Mono";
+    src: url("/fonts/kestrel-mono-bold.woff2") format("woff2");
+    font-weight: 700;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Kestrel Symbols";
+    src: url("/fonts/kestrel-symbols.woff2") format("woff2");
+    unicode-range: U+21BB, U+21E5, U+2298, U+2715, U+2139;
+    font-display: swap;
+}
+
+/* The variables DevClub UI components read, mapped onto Kestrel's palette. */
+:root {
+    --background: var(--k-base);
+    --foreground: var(--k-text);
+    --border-subtle: rgba(205, 214, 244, 0.08);
+    --border-hairline: rgba(205, 214, 244, 0.16);
+    --pattern-line: rgba(205, 214, 244, 0.1);
+    --pattern: rgba(205, 214, 244, 0.05);
+    color-scheme: dark;
+}
+
+@layer base {
+    html {
+        background: var(--k-base);
+        scroll-behavior: smooth;
+    }
+
+    body {
+        background: var(--k-base);
+        color: var(--k-subtext);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+
+    ::selection {
+        background: color-mix(in srgb, var(--k-mauve) 35%, transparent);
+        color: var(--k-text);
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--k-mauve);
+        outline-offset: 3px;
+        border-radius: 4px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    /* biome-ignore-start lint/complexity/noImportantStyles: this override must beat every component's own timing */
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    /* biome-ignore-end lint/complexity/noImportantStyles: end of the reduced-motion override */
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}

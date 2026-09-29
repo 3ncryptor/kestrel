@@ -1,0 +1,13 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+  // The website's own lint (the repository root lints the product). Vendored DevClub UI components in
+  // src/components/ui are our source now and are linted too.
+  "root": false,
+  "files": { "includes": ["app/**", "src/**", "tests/**", "*.ts", "*.mjs", "!src/generated", "!.next", "!node_modules"] },
+  "formatter": { "enabled": false },
+  "linter": {
+    "enabled": true,
+    "rules": { "preset": "recommended" }
+  },
+  "css": { "parser": { "tailwindDirectives": true } }
+}
