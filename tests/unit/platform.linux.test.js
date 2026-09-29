@@ -110,6 +110,44 @@ test('adapter.listProcesses reads /proc, resolves users and skips vanished pids'
         assert.equal(adapter.clockTicks, CLK);
     }));
 
+test('per tick only stat is re-read: identity (user, command) is read once per process (M4 perf)', () =>
+    withFakeRoot({ processes: PROCESSES }, async ({ procRoot, etcRoot }) => {
+        const fs = require('node:fs');
+        const path = require('node:path');
+        const reads = [];
+        const readText = (file, max) => (reads.push(path.relative(procRoot, file)), linux.readProcText(file, max));
+        const adapter = linux.createLinuxAdapter({ procRoot, etcRoot, clockTicks: CLK, pageSize: PAGE, readText });
+        await adapter.listProcesses();
+        reads.length = 0;
+
+        const [again] = [await adapter.listProcesses()];
+        assert.deepEqual(reads.sort(), ['1/stat', '812/stat', '900/stat', '901/stat']);
+        assert.equal(again.find((p) => p.pid === 812).command, 'node server.js');
+
+        // pid 812 exits and the pid is reused by another program: its identity must be read again.
+        fs.writeFileSync(path.join(procRoot, '812', 'stat'), statLine({ pid: 812, comm: 'python3', starttime: 9000 }));
+        fs.writeFileSync(path.join(procRoot, '812', 'cmdline'), 'python3\0app.py\0');
+        reads.length = 0;
+        const reused = (await adapter.listProcesses()).find((p) => p.pid === 812);
+        assert.ok(reads.includes('812/cmdline'));
+        assert.equal(reused.command, 'python3 app.py');
+    }));
+
+test('readProcText reads small /proc files and treats vanished or forbidden ones as absent', () => {
+    const fs = require('node:fs');
+    const os = require('node:os');
+    const path = require('node:path');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kestrel-rpt-'));
+    try {
+        fs.writeFileSync(path.join(dir, 'stat'), 'x'.repeat(20000));
+        assert.equal(linux.readProcText(path.join(dir, 'stat')).length, 20000);
+        assert.equal(linux.readProcText(path.join(dir, 'stat'), 100).length, 100);
+        assert.equal(linux.readProcText(path.join(dir, 'missing')), null);
+    } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+    }
+});
+
 test('adapter.listProcesses shows unknown uids as numbers', () =>
     withFakeRoot({ processes: [{ pid: 7, comm: 'x', uid: 4242 }] }, async ({ procRoot, etcRoot }) => {
         const [proc] = await linux.createLinuxAdapter({ procRoot, etcRoot, clockTicks: CLK, pageSize: PAGE }).listProcesses();
@@ -147,10 +185,49 @@ test('adapter.listeningPorts falls back to /proc/net/tcp when ss is missing', ()
 });
 
 test('adapter exposes os-level cpu times and load average', () => {
-    const adapter = linux.createLinuxAdapter({ clockTicks: CLK, pageSize: PAGE });
+    const adapter = linux.createLinuxAdapter({ procRoot: '/nonexistent', clockTicks: CLK, pageSize: PAGE });
     assert.equal(adapter.id, 'linux');
-    assert.ok(adapter.cpuTimes().length > 0);
+    assert.ok(adapter.cpuTimes().length > 0, 'falls back to os.cpus() without /proc/stat');
     assert.equal(adapter.loadAverage().length, 3);
+});
+
+test('parseProcStatCpus reads per-core times; iowait counts as idle, softirq and steal as busy', () => {
+    const text = 'cpu  10 1 20 300 5 2 3 4 0 0\ncpu0 6 1 10 150 5 1 2 4 0 0\ncpu1 4 0 10 150 0 1 1 0 0 0\nintr 123\n';
+    assert.deepEqual(linux.parseProcStatCpus(text), [
+        { user: 6, nice: 1, sys: 10, idle: 155, irq: 7 },
+        { user: 4, nice: 0, sys: 10, idle: 150, irq: 2 },
+    ]);
+    assert.deepEqual(linux.parseProcStatCpus('cpu  1 2 3 4\n'), []);
+});
+
+test('cpuTimes reads /proc/stat instead of os.cpus() (which also parses cpuinfo and cpufreq every call)', () =>
+    withFakeRoot({ processes: [] }, async ({ procRoot, etcRoot }) => {
+        const fs = require('node:fs');
+        const path = require('node:path');
+        fs.writeFileSync(path.join(procRoot, 'stat'), 'cpu  2 0 2 8 0 0 0 0\ncpu0 1 0 1 4 0 0 0 0\ncpu1 1 0 1 4 0 0 0 0\nbtime 1\n');
+        const adapter = linux.createLinuxAdapter({ procRoot, etcRoot, clockTicks: CLK, pageSize: PAGE });
+        assert.deepEqual(adapter.cpuTimes().map((c) => c.idle), [4, 4]);
+    }));
+
+test('a missing ss is detected once, and socket owners are not rescanned while nothing changes', () => {
+    const tcp = `${TCP_HEADER}   0: 0100007F:1538 00000000:0000 0A 00000000:00000000 00:00000000 00000000  1000        0 5555 1\n`;
+    return withFakeRoot({ processes: PROCESSES, tcp }, async ({ procRoot, etcRoot }) => {
+        let ssCalls = 0;
+        const exec = async () => {
+            ssCalls += 1;
+            throw Object.assign(new Error('spawn ss ENOENT'), { code: 'ENOENT' });
+        };
+        const real = require('node:fs/promises');
+        let readlinks = 0;
+        const fs = { ...real, readlink: (...a) => ((readlinks += 1), real.readlink(...a)) };
+        const adapter = linux.createLinuxAdapter({ procRoot, etcRoot, fs, exec, isRoot: true, clockTicks: CLK, pageSize: PAGE });
+        await adapter.listeningPorts();
+        const scanned = readlinks;
+        const again = await adapter.listeningPorts();
+        assert.equal(ssCalls, 1);
+        assert.equal(readlinks, scanned, 'the known owner of inode 5555 is reused');
+        assert.equal(again.items[0].pid, 812);
+    });
 });
 
 test('readSysconf returns the fallback when getconf is unavailable', () => {

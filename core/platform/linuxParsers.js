@@ -1,5 +1,6 @@
 // Pure parsers and small I/O helpers for the Linux adapter (see linux.js).
 const { execFileSync } = require('child_process');
+const nodeFs = require('fs');
 const { PlatformError } = require('./errors');
 const { parseAddress, formatIpv6 } = require('./net');
 
@@ -36,6 +37,21 @@ function parseProcStat(text) {
         starttime: Number(rest[19]),
         rssPages: Number(rest[21]),
     };
+}
+
+/**
+ * Per-core times from `/proc/stat` (`cpu0 …` lines; the aggregate `cpu` line is skipped). iowait counts
+ * as idle; softirq and steal (time the hypervisor gave to others, visible on EC2) as busy.
+ * @returns {import('./types').CpuTimes[]}
+ */
+function parseProcStatCpus(text) {
+    const cores = [];
+    for (const line of text.split('\n')) {
+        if (!/^cpu\d+ /.test(line)) continue;
+        const [user, nice, system, idle, iowait = 0, irq = 0, softirq = 0, steal = 0] = line.split(/\s+/).slice(1).map(Number);
+        cores.push({ user, nice, sys: system, idle: idle + iowait, irq: irq + softirq + steal });
+    }
+    return cores;
 }
 
 function parseStatusUid(text) {
@@ -156,6 +172,38 @@ async function readOptional(fs, file) {
     }
 }
 
+// One reused buffer for the per-tick /proc reads. Synchronous on purpose: an async readFile is three
+// thread-pool round trips (open, read, close), and 600 processes × 3 files cost 170 ms of CPU per tick in
+// M3. One open/read/close into this buffer costs about 2.5 µs (measured in a Debian container).
+const PROC_TEXT_MAX = 64 * 1024;
+const scratch = Buffer.allocUnsafe(PROC_TEXT_MAX);
+
+/** A small /proc file as text (up to `maxBytes`), or null when the process vanished or it is not ours. */
+function readProcText(file, maxBytes = PROC_TEXT_MAX) {
+    let fd;
+    try {
+        fd = nodeFs.openSync(file, 'r');
+    } catch (err) {
+        if (VANISHED.has(err.code) || err.code === 'EACCES') return null;
+        throw new PlatformError(`Cannot read ${file}: ${err.message}`, 'EREAD');
+    }
+    try {
+        const limit = Math.min(maxBytes, PROC_TEXT_MAX);
+        let length = 0;
+        while (length < limit) {
+            const n = nodeFs.readSync(fd, scratch, length, limit - length, length);
+            if (n === 0) break;
+            length += n;
+        }
+        return scratch.toString('utf-8', 0, length);
+    } catch (err) {
+        if (VANISHED.has(err.code) || err.code === 'EACCES') return null;
+        throw new PlatformError(`Cannot read ${file}: ${err.message}`, 'EREAD');
+    } finally {
+        nodeFs.closeSync(fd);
+    }
+}
+
 async function listPids(fs, procRoot) {
     const entries = await fs.readdir(procRoot);
     return entries.filter((e) => /^\d+$/.test(e)).map(Number).sort((a, b) => a - b);
@@ -163,6 +211,7 @@ async function listPids(fs, procRoot) {
 
 module.exports = {
     parseProcStat,
+    parseProcStatCpus,
     parseStatusUid,
     parseCmdline,
     parseMeminfo,
@@ -177,4 +226,5 @@ module.exports = {
     readOptional,
     listPids,
     READ_CONCURRENCY,
+    readProcText,
 };
