@@ -1,0 +1,25 @@
+# Weekly, grouped updates. Runtime dependencies are exact-pinned in package.json, so every bump arrives
+# as a reviewed PR that CI has to pass; actions are pinned to commit SHAs and updated the same way.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      opentui:
+        patterns: ["@opentui/*", "react"]
+      dev-tools:
+        dependency-type: development
+    commit-message:
+      prefix: "chore(deps)"
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "ci(deps)"
