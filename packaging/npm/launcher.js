@@ -3,8 +3,8 @@
 // per-platform package (kestrel-tui-<os>-<arch>) that npm installs through optionalDependencies,
 // picking the one matching this machine. This file only finds it and runs it with the terminal
 // attached. No install scripts are involved.
-const { spawn } = require('child_process');
-const path = require('path');
+const { spawn } = require('node:child_process');
+const path = require('node:path');
 
 const target = `${process.platform}-${process.arch}`;
 const pkg = `kestrel-tui-${target}`;

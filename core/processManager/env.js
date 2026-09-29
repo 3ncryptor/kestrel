@@ -1,5 +1,5 @@
 // Environment for a managed process (PRD P9): inherited < envFile < inline env.
-const fs = require('fs');
+const fs = require('node:fs');
 const { loadEnvFile } = require('../config/dotenv');
 
 /**

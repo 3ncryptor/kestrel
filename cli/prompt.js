@@ -1,6 +1,6 @@
 // Plain line prompts for init/import. The terminal stays in normal (cooked) mode, so this works the
 // same locally, over SSH and with piped input. Answers typed ahead of a question are kept, in order.
-const readline = require('readline');
+const readline = require('node:readline');
 
 /**
  * @typedef {Object} Prompter

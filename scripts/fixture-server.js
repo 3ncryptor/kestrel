@@ -11,8 +11,8 @@
 //   --echo-env <A,B>      print "env A=<value>" for each variable at start
 //   --trap <SIGNAL>       on SIGNAL print "got SIGNAL" and exit 0
 //   --ignore-term         ignore SIGTERM (to test SIGKILL escalation)
-const http = require('http');
-const net = require('net');
+const http = require('node:http');
+const net = require('node:net');
 
 function arg(name, fallback = undefined) {
     const i = process.argv.indexOf(name);

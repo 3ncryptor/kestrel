@@ -1,5 +1,5 @@
 // Readiness probes (PRD P3): a process is "starting" until its check passes, "unready" if it times out.
-const net = require('net');
+const net = require('node:net');
 
 const DEFAULT_INTERVAL_MS = 500;
 const CONNECT_TIMEOUT_MS = 1000;

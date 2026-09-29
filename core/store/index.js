@@ -1,6 +1,6 @@
 // The single source of truth shared by the engine and the UI (BUILD_PLAN §6).
 // Every update replaces state objects (never mutates) and emits `change` plus a domain event.
-const { EventEmitter } = require('events');
+const { EventEmitter } = require('node:events');
 const { pushBounded } = require('../sampler/ring');
 const { nextLeakState } = require('../sampler/leak');
 const { deriveProcessRows, reconcileSelection } = require('./selectors');

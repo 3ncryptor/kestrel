@@ -1,6 +1,6 @@
 // The sampling loop: reads the platform on a fixed tick and pushes results into a sink (the store).
 // Each data source has its own cadence, and a failing source never stops the others.
-const os = require('os');
+const os = require('node:os');
 const { cpuBusy, processCpu } = require('./cpu');
 
 /** @typedef {import('../platform/types').PlatformAdapter} PlatformAdapter */

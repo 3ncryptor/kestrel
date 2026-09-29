@@ -7,8 +7,8 @@
 //
 // Every package has the same version and no install scripts. All four platforms must be present:
 // publishing a partial set would break `npm i -g kestrel-tui` on the missing ones.
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const ROOT = path.join(__dirname, '..');
 const root = require('../package.json');

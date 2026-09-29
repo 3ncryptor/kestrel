@@ -1,7 +1,7 @@
 // `kestrel init` (PRD §5.2): writes kestrel.json from what the project already has, in the same order
 // Kestrel looks for a stack: a Procfile, then package.json scripts, else a command typed at the prompt.
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const { parseProcfile } = require('../../core/config/procfile');
 const { detectScripts, scriptsToConfig } = require('../../core/config/packageJson');
 const { writeConfigFile } = require('../../core/config/save');

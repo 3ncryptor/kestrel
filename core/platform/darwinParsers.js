@@ -1,6 +1,6 @@
 // Pure parsers for the macOS adapter (ps, vm_stat, sysctl, lsof output) and the memory math shared
 // with the native sampler (darwinNative.js). No I/O.
-const path = require('path');
+const path = require('node:path');
 const { parseAddress } = require('./net');
 
 /** @typedef {import('./types').ProcessInfo} ProcessInfo */

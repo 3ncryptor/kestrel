@@ -1,7 +1,7 @@
 // Run state (PRD P12): `.kestrel/run.json` lists the children Kestrel started, so that after a hard
 // crash (SIGKILL) the next start can find processes left behind and offer to stop them.
-const nodeFs = require('fs');
-const path = require('path');
+const nodeFs = require('node:fs');
+const path = require('node:path');
 
 const FILE_MODE = 0o600;
 const DIR_MODE = 0o700;

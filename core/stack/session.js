@@ -1,6 +1,6 @@
 // The project's stack at runtime (PRD P1–P12): registers the configured processes, starts and stops
 // them through the orchestrator, saves ad-hoc processes and handles children left by a previous run.
-const path = require('path');
+const path = require('node:path');
 const { createOrchestrator } = require('./orchestrator');
 const { findOrphans } = require('../processManager/runState');
 const { groupAlive, signalPgid } = require('../processManager/groups');

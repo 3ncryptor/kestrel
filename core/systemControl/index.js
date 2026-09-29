@@ -1,6 +1,6 @@
 // Signals and priority changes for arbitrary processes. Callers must pass the safety policy first
 // (see policy.js); this module only validates arguments and translates OS errors into plain words.
-const os = require('os');
+const os = require('node:os');
 
 const ALLOWED_SIGNALS = Object.freeze(['SIGTERM', 'SIGKILL', 'SIGINT', 'SIGHUP', 'SIGSTOP', 'SIGCONT']);
 const MIN_PRIORITY = -20;

@@ -1,7 +1,7 @@
 // Writes kestrel.json (saveAdHoc, the package.json picker, `kestrel init`, `kestrel import pm2`).
 // Every write is validated first, so Kestrel never saves a config it could not load again.
-const nodeFs = require('fs');
-const path = require('path');
+const nodeFs = require('node:fs');
+const path = require('node:path');
 const { validateConfig } = require('./schema');
 
 const serialize = (raw) => `${JSON.stringify(raw, null, 2)}\n`;

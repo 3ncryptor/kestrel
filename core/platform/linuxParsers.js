@@ -1,6 +1,6 @@
 // Pure parsers and small I/O helpers for the Linux adapter (see linux.js).
-const { execFileSync } = require('child_process');
-const nodeFs = require('fs');
+const { execFileSync } = require('node:child_process');
+const nodeFs = require('node:fs');
 const { PlatformError } = require('./errors');
 const { parseAddress, formatIpv6 } = require('./net');
 

@@ -1,6 +1,6 @@
 // Validates and normalizes kestrel.json (BUILD_PLAN §8.2). Collects EVERY error with its path,
 // so a user fixes the whole file in one pass instead of one error per run.
-const path = require('path');
+const path = require('node:path');
 const { isValidName } = require('../names');
 const { findCycle, startWaves } = require('../stack/graph');
 const { DEFAULT_THRESHOLDS } = require('../store/state');

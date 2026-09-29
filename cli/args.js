@@ -1,5 +1,5 @@
 // Command-line parsing (BUILD_PLAN §8.7). Pure: argv in, parsed command out, or a UsageError.
-const { parseArgs } = require('util');
+const { parseArgs } = require('node:util');
 
 const COMMANDS = Object.freeze(['dashboard', 'pm', 'sm', 'init', 'import', 'doctor', 'update', 'help', 'version']);
 // Unix reads `-pm` as `-p -m`, so these aliases are rewritten before parseArgs ever sees them.

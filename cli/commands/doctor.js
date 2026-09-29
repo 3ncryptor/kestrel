@@ -1,7 +1,7 @@
 // `kestrel doctor`: checks what Kestrel needs on this machine and says how to fix what is missing.
 // ✓ ok · ! a warning with a fix · ✗ a failure. Only failures exit 1, so it can gate scripts and CI.
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const { version: VERSION } = require('../../package.json');
 const { createPlatform } = require('../../core/platform');
 const { loadStack } = require('../../core/config');

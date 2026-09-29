@@ -1,9 +1,9 @@
 // `kestrel import pm2`: converts a running pm2 setup (preferred: plain data) or an ecosystem file
 // into a kestrel.json object. It only produces config, and never starts anything.
-const { execFile } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-const util = require('util');
+const { execFile } = require('node:child_process');
+const fs = require('node:fs');
+const path = require('node:path');
+const util = require('node:util');
 const { toProcessName } = require('./packageJson');
 
 const ECOSYSTEM_FILES = ['ecosystem.config.js', 'ecosystem.config.cjs', 'ecosystem.config.json'];

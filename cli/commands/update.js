@@ -1,11 +1,11 @@
 // `kestrel update [--check]`: replaces a standalone binary with the latest GitHub release, after
 // checking the archive's SHA-256 against the release's SHA256SUMS and running the new binary once.
 // Homebrew, npm and source installs are pointed at their own update command instead.
-const crypto = require('crypto');
-const { execFileSync } = require('child_process');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+const crypto = require('node:crypto');
+const { execFileSync } = require('node:child_process');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
 const { version: VERSION } = require('../../package.json');
 const release = require('../release');
 

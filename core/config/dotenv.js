@@ -1,6 +1,6 @@
 // Minimal, predictable .env parsing: KEY=VALUE, `export ` prefix, quotes, `#` comments.
 // No variable interpolation in v1 (documented in BUILD_PLAN §8.2).
-const fs = require('fs');
+const fs = require('node:fs');
 
 const KEY_PATTERN = /^[A-Za-z_][A-Za-z0-9_.-]*$/;
 const ESCAPES = { n: '\n', r: '\r', t: '\t', '"': '"', '\\': '\\' };

@@ -9,7 +9,7 @@
 // the ps/lsof children it spawned (a 1.5% "engine" was really ~5%). Each measurement runs in
 // `sh -c '<runtime> bench.js --engine N; times'`: the shell's `times` reports the CPU of every descendant
 // it waited for, children included. A run with a 0 s window measures start-up alone and is subtracted.
-const { spawnSync } = require('child_process');
+const { spawnSync } = require('node:child_process');
 
 // The product target (PRD §7, all of Kestrel's CPU, children included) is reported; CI fails only
 // above the regression guard, set above today's measurements (BUILD_PLAN §11.3). The target is

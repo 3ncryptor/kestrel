@@ -1,7 +1,7 @@
 // macOS platform adapter: ps, vm_stat, sysctl and lsof, always via execFile (no shell).
-const { execFile } = require('child_process');
-const os = require('os');
-const util = require('util');
+const { execFile } = require('node:child_process');
+const os = require('node:os');
+const util = require('node:util');
 const { toolError } = require('./errors');
 const parsers = require('./darwinParsers');
 const { createNativeSource } = require('./darwinNative');

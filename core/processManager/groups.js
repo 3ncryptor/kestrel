@@ -1,6 +1,6 @@
 // Process-group helpers. Every managed child leads its own group (`detached: true`), so signalling
 // `-pgid` reaches everything it spawned.
-const path = require('path');
+const path = require('node:path');
 
 /** "node scripts/dummy-worker.js" → "dummy-worker": prefers the script over the interpreter. */
 function deriveId(cmd) {

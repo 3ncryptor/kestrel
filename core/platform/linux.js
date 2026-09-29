@@ -1,10 +1,10 @@
 // Linux platform adapter. Reads /proc directly: `ps %cpu` on Linux is a lifetime average, so
 // processes report cumulative cpuTicks and the sampler turns tick deltas into a current CPU%.
-const { execFile } = require('child_process');
-const fsPromises = require('fs/promises');
-const os = require('os');
-const path = require('path');
-const util = require('util');
+const { execFile } = require('node:child_process');
+const fsPromises = require('node:fs/promises');
+const os = require('node:os');
+const path = require('node:path');
+const util = require('node:util');
 const { toolError } = require('./errors');
 const parsers = require('./linuxParsers');
 

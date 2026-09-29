@@ -1,7 +1,7 @@
 // Finds and loads the project's stack (PRD §5.2). First match wins:
 //   --config <path>  →  kestrel.json (walking up)  →  Procfile (cwd)  →  package.json scripts (cwd)
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const { validateConfig } = require('./schema');
 const { parseProcfile } = require('./procfile');
 const { detectScripts } = require('./packageJson');

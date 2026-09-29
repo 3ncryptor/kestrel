@@ -8,10 +8,10 @@
 // OpenTUI ships its native core per platform (@opentui/core-<os>-<arch>), and `bun install` fetches only
 // the one for the machine it runs on. So every target is built on its own OS/arch (the release workflow
 // runs one job per target) instead of cross-compiling.
-const { spawnSync } = require('child_process');
-const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
+const { spawnSync } = require('node:child_process');
+const crypto = require('node:crypto');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const ROOT = path.join(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');

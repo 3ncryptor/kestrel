@@ -1,6 +1,6 @@
 // Saved logs (PRD P5): `.kestrel/logs/<id>.log`, owner-only, rotated, written in small batches.
-const nodeFs = require('fs');
-const path = require('path');
+const nodeFs = require('node:fs');
+const path = require('node:path');
 
 const DEFAULT_MAX_BYTES = 10 * 1024 * 1024;
 const DEFAULT_KEEP = 3;

@@ -1,7 +1,7 @@
 // The process manager: owns one Supervisor per managed process and publishes their state to the store.
 // Lifecycle logic for a single process lives in supervisor.js; this file adds naming, the per-id
 // operation queue, run-state bookkeeping and whole-manager shutdown.
-const { spawn } = require('child_process');
+const { spawn } = require('node:child_process');
 const { computeDelay: defaultComputeDelay } = require('./backoff');
 const { Supervisor } = require('./supervisor');
 const { createRunState } = require('./runState');

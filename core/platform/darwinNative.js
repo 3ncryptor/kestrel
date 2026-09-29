@@ -6,7 +6,7 @@
 // (/bin/ps is setuid root; htop has the same limit). Other users' processes (root daemons,
 // WindowServer…) get those figures from a trimmed `ps` every 5 s instead. Run as root and everything is
 // native. The native layer is a parameter, so this logic is tested with a fake under Node.
-const path = require('path');
+const path = require('node:path');
 const { toolError } = require('./errors');
 const { STATE_LABELS, parseEtime, memoryUsedMB, cachedMB, BYTES_PER_MB } = require('./darwinParsers');
 

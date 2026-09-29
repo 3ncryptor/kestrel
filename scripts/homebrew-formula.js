@@ -4,7 +4,7 @@
 // installs the prebuilt binary (no build from source, no dependencies).
 //
 //   node scripts/homebrew-formula.js <version> <SHA256SUMS> > Formula/kestrel.rb
-const fs = require('fs');
+const fs = require('node:fs');
 const { parseSums } = require('../cli/release');
 
 const REPO = 'https://github.com/3ncryptor/kestrel';

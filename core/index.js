@@ -1,7 +1,7 @@
 // Composition root: wires the engine together and exposes only the UI contract (store + actions)
 // plus lifecycle controls. Presentation layers import this file and nothing else from core/.
-const os = require('os');
-const path = require('path');
+const os = require('node:os');
+const path = require('node:path');
 const { createPlatform } = require('./platform');
 const { Store } = require('./store');
 const { createSampler } = require('./sampler');
