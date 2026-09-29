@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/cn';
 import { SITE, VERSION } from '@/lib/site';
+import { OPEN_SEARCH_EVENT } from './SiteShortcuts';
 
 const SCROLLED_PX = 8;
 
@@ -46,6 +47,16 @@ export function Nav() {
                     </span>
                 </Link>
                 <ul className="flex items-center gap-1 text-sm">
+                    <li>
+                        <button
+                            type="button"
+                            onClick={() => window.dispatchEvent(new Event(OPEN_SEARCH_EVENT))}
+                            className="mr-1 hidden items-center gap-2 rounded-md border border-white/10 px-2.5 py-1 text-k-overlay0 transition-colors hover:border-white/20 hover:text-k-text md:flex"
+                        >
+                            Search
+                            <kbd className="rounded border border-white/10 px-1 font-mono text-[10px]">⌘K</kbd>
+                        </button>
+                    </li>
                     {LINKS.map((link) => (
                         <li key={link.href}>
                             <Link href={link.href} className="rounded-md px-3 py-1.5 transition-colors hover:bg-white/[0.06] hover:text-k-text">
