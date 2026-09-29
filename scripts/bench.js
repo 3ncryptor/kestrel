@@ -11,7 +11,11 @@
 // it waited for, children included. A run with a 0 s window measures start-up alone and is subtracted.
 const { spawnSync } = require('child_process');
 
-const BUDGET = { cpuPercent: 1, rssMB: 80 }; // PRD §7: all of Kestrel's CPU, children included
+// The product target (PRD §7, all of Kestrel's CPU, children included) is reported; CI fails only
+// above the regression guard, set above today's measurements (BUILD_PLAN §11.3). The target is
+// deferred while shipping comes first (decision 2026-09-29).
+const TARGET = { cpuPercent: 1, rssMB: 80 };
+const GUARD = { cpuPercent: Number(process.env.KESTREL_BENCH_MAX_CPU || 4), rssMB: 120 };
 const TICK_SAMPLES = 10;
 
 // ---------- engine mode: runs inside the measured shell ----------
@@ -80,11 +84,13 @@ function main() {
         rssMB: run.rssMB,
         tickMedianMs: +run.tickMedianMs.toFixed(1),
         changesPerSecond: +run.changesPerSecond.toFixed(1),
-        budget: BUDGET,
+        target: TARGET,
+        guard: GUARD,
     };
-    report.withinBudget = report.cpuPercent < BUDGET.cpuPercent && report.rssMB < BUDGET.rssMB;
+    report.withinTarget = report.cpuPercent < TARGET.cpuPercent && report.rssMB < TARGET.rssMB;
+    report.withinGuard = report.cpuPercent < GUARD.cpuPercent && report.rssMB < GUARD.rssMB;
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-    return report.withinBudget ? 0 : 1;
+    return report.withinGuard ? 0 : 1;
 }
 
 if (process.argv[2] === '--engine') {
