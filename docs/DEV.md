@@ -46,6 +46,13 @@ Releases have their own workflow, `.github/workflows/release.yml`; see [RELEASIN
 To rehearse the npm part on your machine (Node 22+), with tarballs from a release run's `release`
 artifact: `sh scripts/npm-rehearse.sh <dir>/npm`. It uses a throwaway local registry, never npmjs.com.
 
+## Website
+
+The site lives in `website/` (Next.js, its own `bun.lock`); [website/README.md](../website/README.md) has the details.
+Its dashboard, keys page and CLI output are captured from the product by `bun run website:generate`, and CI fails when
+those captures are stale, so after changing the UI, the help text or the version, run it and commit
+`website/src/generated/`.
+
 ## End to end, in a real terminal
 
 ```sh

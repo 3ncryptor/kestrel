@@ -34,7 +34,8 @@ skipped. Run one before tagging.
 ## Every release
 
 1. On a branch: set the version in `package.json`, and move the `Unreleased` entries of `CHANGELOG.md`
-   into `## [x.y.z] - YYYY-MM-DD` (update the links at the bottom). Merge it to `main` with CI green.
+   into `## [x.y.z] - YYYY-MM-DD` (update the links at the bottom). Run `bun run website:generate` (the site shows the
+   captured `kestrel --version`) and commit it too. Merge it to `main` with CI green.
 2. Rehearse: Actions → Release → Run workflow on `main`. Everything must be green.
 3. Tag and push:
 

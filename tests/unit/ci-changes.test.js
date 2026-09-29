@@ -17,7 +17,13 @@ function classify(files, { event = 'pull_request', all = false } = {}) {
 }
 
 test('a docs-only change runs nothing', () => {
-    assert.deepEqual(classify(['README.md', 'docs/CONFIG.md', 'CONTRIBUTING.md', '.github/ISSUE_TEMPLATE/bug_report.yml', 'LICENSE']), {
+    assert.deepEqual(classify(['README.md', 'docs/DEV.md', 'CONTRIBUTING.md', '.github/ISSUE_TEMPLATE/bug_report.yml', 'LICENSE']), {
+        code: false, platform: false, setup: false, engine: false, build: false, 'test-os': ['ubuntu-24.04'],
+    });
+});
+
+test('a website-only change runs no job: CI covers the package, and Vercel builds the site', () => {
+    assert.deepEqual(classify(['website/app/page.tsx', 'website/bun.lock']), {
         code: false, platform: false, setup: false, engine: false, build: false, 'test-os': ['ubuntu-24.04'],
     });
 });

@@ -6,6 +6,7 @@
 #   setup files or dependencies            → also the developer setup on Linux, macOS and Windows
 #   engine code                            → also the CPU regression guard
 #   build tooling (or any code on main)    → the standalone binaries for all four targets
+#   the website (website/)                 → nothing: CI covers the package only; Vercel builds the site
 # Pushes to main also run macOS as a safety net. "CI result" is the one check to require in branch
 # protection: skipped jobs count as passed there. Nothing here publishes anything.
 name: CI

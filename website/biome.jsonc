@@ -1,0 +1,20 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+  // The website's own lint (the repository root lints the product). Vendored DevClub UI components in
+  // src/components/ui are our source now and are linted too.
+  "root": false,
+  "files": { "includes": ["app/**", "src/**", "tests/**", "*.ts", "*.mjs", "!src/generated", "!.next", "!node_modules"] },
+  "formatter": { "enabled": false },
+  "linter": {
+    "enabled": true,
+    "rules": { "preset": "recommended" }
+  },
+  "overrides": [
+    {
+      // Vendored DevClub UI components render static lists that never reorder, where index keys are fine.
+      "includes": ["src/components/ui/**"],
+      "linter": { "rules": { "suspicious": { "noArrayIndexKey": "off" } } }
+    }
+  ],
+  "css": { "parser": { "tailwindDirectives": true } }
+}

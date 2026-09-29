@@ -3,6 +3,7 @@
 #   git diff --name-only BASE HEAD | EVENT=pull_request sh scripts/ci-changes.sh
 #   ALL=true EVENT=workflow_dispatch sh scripts/ci-changes.sh < /dev/null
 # Prints key=value lines: code, platform, setup, engine, build, test-os (a JSON list of runners).
+# The website (website/) is not CI's concern: it has no job here, and Vercel builds it.
 set -eu
 EVENT=${EVENT:-pull_request}
 all=${ALL:-false}
@@ -11,8 +12,8 @@ code=$all platform=$all setup=$all engine=$all packaging=$all
 while IFS= read -r f || [ -n "$f" ]; do  # the last line may lack a newline
     [ -n "$f" ] || continue
     case "$f" in
-        # Documentation and repository metadata: no job needs to run.
-        *.md | docs/* | LICENSE | .editorconfig | .github/ISSUE_TEMPLATE/* | .github/CODEOWNERS | .github/dependabot.yml) ;;
+        # Documentation, repository metadata and the website: no job needs to run.
+        *.md | docs/* | LICENSE | .editorconfig | .github/ISSUE_TEMPLATE/* | .github/CODEOWNERS | .github/dependabot.yml | website/*) ;;
         # A change to CI itself runs all of it.
         .github/workflows/ci.yml | scripts/ci-changes.sh) code=true platform=true setup=true engine=true packaging=true ;;
         *) code=true ;;
