@@ -1,0 +1,33 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "files": {
+    "includes": ["core/**", "cli/**", "ui/**", "scripts/**", "tests/**", "packaging/**", "!tests/fixtures"]
+  },
+  // Lint only: the code has one consistent hand-written style (see .editorconfig), and a formatter pass
+  // would rewrite every file for no behavioural gain.
+  "formatter": { "enabled": false },
+  "assist": { "enabled": false },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "a11y": {
+        // `role` is a semantic colour role (<Tone role="muted">) in a terminal UI, not an ARIA role.
+        "useValidAriaRole": "off"
+      }
+    }
+  },
+  "overrides": [
+    {
+      // sanitizeLine strips terminal control sequences from child output: matching them is the point.
+      "includes": ["ui/logic/logs.js"],
+      "linter": { "rules": { "suspicious": { "noControlCharactersInRegex": "off" } } }
+    },
+    {
+      // Keys here are positions inside fixed-layout rows (border parts, meter cells, graph rows,
+      // highlight segments); nothing is reordered. Rows that can reorder are keyed by pid or id.
+      "includes": ["ui/components/**", "ui/screens/**"],
+      "linter": { "rules": { "suspicious": { "noArrayIndexKey": "off" } } }
+    }
+  ]
+}

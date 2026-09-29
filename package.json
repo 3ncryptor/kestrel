@@ -38,7 +38,8 @@
     "test:coverage": "node --test --test-timeout=20000 --experimental-test-coverage tests/unit tests/integration",
     "typecheck": "tsc -p tsconfig.core.json",
     "build": "bun scripts/build.js",
-    "build:archive": "bun scripts/build.js --archive"
+    "build:archive": "bun scripts/build.js --archive",
+    "lint": "biome lint"
   },
   "dependencies": {
     "@opentui/core": "0.5.12",
@@ -46,6 +47,7 @@
     "react": "19.3.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.14",
     "@types/node": "20.19.43",
     "typescript": "6.0.3"
   },
