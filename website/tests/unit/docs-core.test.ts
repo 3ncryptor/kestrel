@@ -48,6 +48,12 @@ describe('rewriteHref', () => {
         expect(rewriteHref('BUILD_PLAN.md#11-quality', 'docs/CONFIG.md')).toBe('https://github.com/3ncryptor/kestrel/blob/main/docs/BUILD_PLAN.md#11-quality');
     });
 
+    test('script and data URLs are never linked, whatever their case or spacing', () => {
+        for (const href of ['javascript:alert(1)', 'JavaScript:alert(1)', ' javascript:void(0)', 'vbscript:x', 'data:text/html,<script>x</script>']) {
+            expect(rewriteHref(href, 'README.md'), href).toBe('#');
+        }
+    });
+
     test('anchors, external links and mail links are left alone', () => {
         expect(rewriteHref('#readiness', 'docs/CONFIG.md')).toBe('#readiness');
         expect(rewriteHref('https://docs.npmjs.com/x', 'README.md')).toBe('https://docs.npmjs.com/x');

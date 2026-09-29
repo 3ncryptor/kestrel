@@ -37,6 +37,8 @@ export function extractSections(markdown: string, { from, exclude = [] }: { from
 
 /** A link from a repository document, rewritten for the site: its own pages locally, other files on GitHub. */
 export function rewriteHref(href: string, sourceFile: string): string {
+    // Defence in depth (the sources are this repository's own files): never emit a script or data URL.
+    if (/^\s*(javascript|vbscript|data):/i.test(href)) return '#';
     if (href.startsWith('#') || /^(mailto|tel):/.test(href)) return href;
     let target = href;
     if (href.startsWith(`${REPO_BLOB}/`)) target = href.slice(REPO_BLOB.length + 1);
