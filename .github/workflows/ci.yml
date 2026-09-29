@@ -6,6 +6,7 @@
 #   setup files or dependencies            → also the developer setup on Linux, macOS and Windows
 #   engine code                            → also the CPU regression guard
 #   build tooling (or any code on main)    → the standalone binaries for all four targets
+#   the website, the docs it renders, the UI → the website: fresh captures, lint, types, tests, build, E2E
 # Pushes to main also run macOS as a safety net. "CI result" is the one check to require in branch
 # protection: skipped jobs count as passed there. Nothing here publishes anything.
 name: CI
@@ -38,6 +39,7 @@ jobs:
       setup: ${{ steps.diff.outputs.setup }}
       engine: ${{ steps.diff.outputs.engine }}
       build: ${{ steps.diff.outputs.build }}
+      website: ${{ steps.diff.outputs.website }}
       test-os: ${{ steps.diff.outputs.test-os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -74,7 +76,7 @@ jobs:
       - run: bun run lint
       - run: bun run typecheck
       - name: shellcheck
-        run: shellcheck -s sh setup.sh .husky/pre-commit packaging/install.sh scripts/*.sh scripts/e2e/*.sh
+        run: shellcheck -s sh setup.sh .husky/pre-commit packaging/install.sh scripts/*.sh scripts/e2e/*.sh website/scripts/*.sh
 
   test:
     name: Tests and E2E (${{ matrix.os }})
@@ -184,9 +186,50 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
+  website:
+    name: Website
+    needs: changes
+    if: needs.changes.outputs.website == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: The captured frames, keys and CLI output match the product
+        working-directory: .
+        run: |
+          bun install --frozen-lockfile
+          bun run website:generate
+          if ! git diff --exit-code --stat -- website/src/generated; then
+            echo "::error::website/src/generated is out of date: run 'bun run website:generate' and commit the result"
+            exit 1
+          fi
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bun run typecheck
+      - run: bun run test
+      - run: bun run build
+      - run: bunx playwright install --with-deps chromium
+      - name: End-to-end and accessibility tests (Chromium)
+        run: bun run test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: website-e2e
+          path: website/test-results
+          retention-days: 7
+
   result:
     name: CI result
-    needs: [changes, lint, test, linux-distros, setup, bench, build]
+    needs: [changes, lint, test, linux-distros, setup, bench, build, website]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 2

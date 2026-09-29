@@ -14,6 +14,18 @@ updates:
         dependency-type: development
     commit-message:
       prefix: "chore(deps)"
+  - package-ecosystem: npm
+    directory: /website
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      next-react:
+        patterns: ["next", "react", "react-dom", "@types/react", "@types/react-dom"]
+      site-dev-tools:
+        dependency-type: development
+    commit-message:
+      prefix: "chore(website-deps)"
   - package-ecosystem: github-actions
     directory: /
     schedule:
