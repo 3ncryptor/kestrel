@@ -4,6 +4,13 @@ import mono from '@/generated/hero-mono.json';
 import standard from '@/generated/hero-standard.json';
 import { ATTR, type EncodedFrames, decodeAll, frameText, spanStyle } from '@/lib/frames';
 
+/** arr[i], failing the test (not returning undefined) when it is missing. */
+function at<T>(arr: readonly T[] | undefined, i: number): T {
+    const value = arr?.[i];
+    if (value === undefined) throw new Error(`no element ${i}`);
+    return value;
+}
+
 const tiny: EncodedFrames = {
     version: 1,
     cols: 3,
@@ -17,17 +24,18 @@ const tiny: EncodedFrames = {
 
 describe('decoding hero frames', () => {
     test('frame 0 has every line and later frames change only the lines they carry', () => {
-        const [first, second] = decodeAll(tiny);
-        expect(frameText(first!)).toEqual(['abc', '界x']);
-        expect(frameText(second!)).toEqual(['abc', 'xyz']);
-        expect(second!.lines[0]).toBe(first!.lines[0]);
+        const frames = decodeAll(tiny);
+        const [first, second] = [at(frames, 0), at(frames, 1)];
+        expect(frameText(first)).toEqual(['abc', '界x']);
+        expect(frameText(second)).toEqual(['abc', 'xyz']);
+        expect(second.lines[0]).toBe(first.lines[0]);
     });
 
     test('colours come from the palette, null means the terminal default, widths default to the length', () => {
-        const [first] = decodeAll(tiny);
-        expect(first!.lines[0]![0]).toEqual({ text: 'ab', fg: '#f38ba8', bg: '#000000', attrs: 0, width: 2 });
-        expect(first!.lines[0]![1]).toEqual({ text: 'c', fg: null, bg: null, attrs: 1, width: 1 });
-        expect(first!.lines[1]![0]!.width).toBe(2);
+        const first = at(decodeAll(tiny), 0);
+        expect(at(at(first.lines, 0), 0)).toEqual({ text: 'ab', fg: '#f38ba8', bg: '#000000', attrs: 0, width: 2 });
+        expect(at(at(first.lines, 0), 1)).toEqual({ text: 'c', fg: null, bg: null, attrs: 1, width: 1 });
+        expect(at(at(first.lines, 1), 0).width).toBe(2);
     });
 
     test.each([
