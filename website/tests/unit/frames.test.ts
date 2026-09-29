@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 import compact from '@/generated/hero-compact.json';
 import mono from '@/generated/hero-mono.json';
 import standard from '@/generated/hero-standard.json';
-import { ATTR, type EncodedFrames, decodeAll, frameText, spanStyle } from '@/lib/frames';
+import { ATTR, decodeAll, type EncodedFrames, frameText, spanStyle } from '@/lib/frames';
 
 /** arr[i], failing the test (not returning undefined) when it is missing. */
 function at<T>(arr: readonly T[] | undefined, i: number): T {

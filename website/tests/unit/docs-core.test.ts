@@ -29,6 +29,14 @@ describe('extractSections', () => {
         expect(out).toBe('## Install\n\nnpm install\n\n## Troubleshooting\n\nfix it\n');
     });
 
+    test('a document that starts with its first section keeps it', () => {
+        expect(extractSections('## Install\n\nnpm install\n', { from: 'Install' })).toBe('## Install\n\nnpm install\n');
+    });
+
+    test('a heading on the last line, with no newline after it, keeps its whole title', () => {
+        expect(extractSections('## Install\n\nnpm install\n\n## Troubleshooting', { from: 'Install', exclude: ['Troubleshooting'] })).toBe('## Install\n\nnpm install\n\n');
+    });
+
     test('fails loudly when an expected heading is missing, so a README edit cannot silently break a page', () => {
         expect(() => extractSections(README, { from: 'Installation' })).toThrow(/no "## Installation" heading/);
         expect(() => extractSections(README, { from: 'Install', exclude: ['Usage'] })).toThrow(/no "## Usage" heading/);

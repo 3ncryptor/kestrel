@@ -12,10 +12,13 @@ const SITE_ROUTES: Record<string, string> = {
 
 const headingPattern = (title: string) => new RegExp(`^## ${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, 'm');
 
-/** Splits markdown into its `## ` sections (the text before the first one is dropped). */
+/** Splits markdown into its `## ` sections (any text before the first one is dropped). */
 function sections(markdown: string): Array<{ title: string; body: string }> {
-    const parts = markdown.split(/^(?=## )/m).slice(1);
-    return parts.map((body) => ({ title: body.slice(3, body.indexOf('\n')).trim(), body }));
+    const parts = markdown.split(/^(?=## )/m).filter((part) => part.startsWith('## '));
+    return parts.map((body) => {
+        const newline = body.indexOf('\n');
+        return { title: body.slice(3, newline === -1 ? body.length : newline).trim(), body };
+    });
 }
 
 /**
