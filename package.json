@@ -1,0 +1,44 @@
+{
+  "name": "kestrel-tui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A portable ops cockpit for the terminal: system monitor and process manager in one binary",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/3ncryptor/kestrel.git"
+  },
+  "homepage": "https://github.com/3ncryptor/kestrel#readme",
+  "bugs": {
+    "url": "https://github.com/3ncryptor/kestrel/issues"
+  },
+  "bin": {
+    "kestrel": "cli/index.js"
+  },
+  "scripts": {
+    "start": "NODE_ENV=production bun cli/index.js",
+    "dev": "bun cli/index.js",
+    "test": "node --test --test-timeout=20000 tests/unit tests/integration",
+    "test:bun": "bun test --timeout 20000 tests/unit tests/integration",
+    "test:ui": "bun test tests/ui",
+    "test:coverage": "node --test --test-timeout=20000 --experimental-test-coverage tests/unit tests/integration",
+    "typecheck": "tsc -p tsconfig.core.json"
+  },
+  "dependencies": {
+    "@opentui/core": "0.5.12",
+    "@opentui/react": "0.5.12",
+    "react": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.19.43",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=20",
+    "bun": ">=1.3.0"
+  },
+  "os": [
+    "darwin",
+    "linux"
+  ]
+}
