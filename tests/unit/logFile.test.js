@@ -48,7 +48,12 @@ test('files rotate at maxBytes and keep at most `keep` old files', (t) => {
 test('a write failure disables the file and reports once, without throwing', (t) => {
     const dir = tempDir(t);
     const errors = [];
-    const brokenFs = { ...fs, appendFileSync: () => { throw new Error('disk full'); } };
+    const brokenFs = {
+        ...fs,
+        writeSync: () => {
+            throw new Error('disk full');
+        },
+    };
     const log = createLogFile({ dir, id: 'x', flushMs: 10000, fs: brokenFs, onError: (e) => errors.push(e.message) });
     log.write(line('a'));
     log.flushSync();
@@ -57,4 +62,19 @@ test('a write failure disables the file and reports once, without throwing', (t)
     assert.deepEqual(errors, ['disk full']);
     assert.equal(log.disabled, true);
     log.close();
+});
+
+test('a symlink planted at the log path is refused, not written through (CodeQL js/file-system-race)', (t) => {
+    const dir = tempDir(t);
+    fs.mkdirSync(dir, { recursive: true });
+    const victim = path.join(path.dirname(dir), 'victim.txt');
+    fs.writeFileSync(victim, 'original\n');
+    fs.symlinkSync(victim, path.join(dir, 'api.log'));
+    const errors = [];
+    const log = createLogFile({ dir, id: 'api', flushMs: 5, onError: (err) => errors.push(err) });
+    log.write(line('should not land in the victim'));
+    log.flushSync();
+    assert.equal(fs.readFileSync(victim, 'utf-8'), 'original\n');
+    assert.equal(errors.length, 1);
+    assert.equal(log.disabled, true);
 });
