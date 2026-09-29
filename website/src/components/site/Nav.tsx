@@ -3,15 +3,11 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/cn';
-import { SITE, VERSION } from '@/lib/site';
+import { VERSION } from '@/lib/site';
+import { SiteMenu } from './SiteMenu';
 import { OPEN_SEARCH_EVENT } from './SiteShortcuts';
 
 const SCROLLED_PX = 8;
-
-const LINKS = [
-    { href: '/docs', label: 'Docs' },
-    { href: '/changelog', label: 'Changelog' },
-] as const;
 
 /** The wordmark: `kestrel` with a blinking block cursor, like a terminal prompt. */
 export function Wordmark() {
@@ -23,6 +19,7 @@ export function Wordmark() {
     );
 }
 
+/** The name on the left; on the right only Search and the Menu, as pills. */
 export function Nav() {
     const [scrolled, setScrolled] = useState(false);
     useEffect(() => {
@@ -42,39 +39,19 @@ export function Nav() {
             <nav aria-label="Main" className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
                 <Link href="/" aria-label="Kestrel home" className="flex items-center gap-3">
                     <Wordmark />
-                    <span className="hidden rounded-full border border-k-mauve/30 bg-k-mauve/10 px-2 py-0.5 font-mono text-[11px] text-k-mauve sm:inline">
-                        v{VERSION} · preview
-                    </span>
+                    <span className="hidden rounded-full border border-white/10 px-2 py-0.5 font-mono text-[11px] text-k-muted sm:inline">v{VERSION}</span>
                 </Link>
-                <ul className="flex items-center gap-1 text-sm">
-                    <li>
-                        <button
-                            type="button"
-                            onClick={() => window.dispatchEvent(new Event(OPEN_SEARCH_EVENT))}
-                            className="mr-1 hidden items-center gap-2 rounded-md border border-white/10 px-2.5 py-1 text-k-muted transition-colors hover:border-white/20 hover:text-k-text md:flex"
-                        >
-                            Search
-                            <kbd className="rounded border border-white/10 px-1 font-mono text-[10px]">⌘K</kbd>
-                        </button>
-                    </li>
-                    {LINKS.map((link) => (
-                        <li key={link.href}>
-                            <Link href={link.href} className="rounded-md px-3 py-1.5 transition-colors hover:bg-white/[0.06] hover:text-k-text">
-                                {link.label}
-                            </Link>
-                        </li>
-                    ))}
-                    <li>
-                        <a href={SITE.repo} className="rounded-md px-3 py-1.5 transition-colors hover:bg-white/[0.06] hover:text-k-text">
-                            GitHub
-                        </a>
-                    </li>
-                    <li className="hidden sm:block">
-                        <a href={SITE.npm} className="rounded-md px-3 py-1.5 transition-colors hover:bg-white/[0.06] hover:text-k-text">
-                            npm
-                        </a>
-                    </li>
-                </ul>
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={() => window.dispatchEvent(new Event(OPEN_SEARCH_EVENT))}
+                        className="inline-flex h-10 items-center gap-2.5 rounded-full border border-white/15 px-4 text-k-subtext text-sm transition-colors hover:border-white/30 hover:text-k-text"
+                    >
+                        Search
+                        <kbd className="hidden rounded border border-white/10 px-1 font-mono text-[10px] sm:inline">⌘K</kbd>
+                    </button>
+                    <SiteMenu />
+                </div>
             </nav>
         </header>
     );
