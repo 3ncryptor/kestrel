@@ -6,6 +6,17 @@ All notable changes to Kestrel are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-29
+
+### Fixed
+
+- **npm package pages.** Every package now has a README written for npm: `kestrel-tui` covers install,
+  commands, keys, stacks, verification and troubleshooting, and each `kestrel-tui-<os>-<arch>` package
+  explains what it is and that `kestrel-tui` installs it. In 0.1.0 the platform packages had no README
+  and `kestrel-tui` showed the pre-release repository README.
+- `kestrel --help` links to the documentation online instead of `docs/` paths that only exist in a
+  source checkout.
+
 ## [0.1.0] - 2026-09-29
 
 The first preview release, for macOS and Linux on arm64 and x64.
@@ -33,5 +44,6 @@ The first preview release, for macOS and Linux on arm64 and x64.
   install scripts, published with npm provenance), a checksum-verifying `curl | sh` installer, and
   release archives with `SHA256SUMS` and GitHub build attestations.
 
-[Unreleased]: https://github.com/3ncryptor/kestrel/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/3ncryptor/kestrel/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/3ncryptor/kestrel/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/3ncryptor/kestrel/releases/tag/v0.1.0
