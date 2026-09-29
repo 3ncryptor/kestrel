@@ -482,6 +482,19 @@ Tried and dropped, because they gave no measurable gain: caching FFI pointers, a
 calls for other users' processes. Getting under 1% therefore needs structural changes (for example
 sampling less while nothing is on screen, or a longer default interval), not micro-optimisations.
 
+**The UI** (`scripts/bench-ui.jsx`: the real App in OpenTUI's test renderer, 570 processes, 160×50,
+production React):
+- A frame costs ~3.1 ms of CPU (it was 3.7 ms before the braille graph stopped slicing per cell). A frame
+  with nothing changed costs 0.2 ms.
+- Each tick makes ~45 text updates (9 cpu rows, ~30 visible process rows whose values really changed,
+  the mem meters) with ~390 styled chunks, and each update costs ~18 µs inside OpenTUI's native text
+  buffer. That is ~60% of a frame and internal to OpenTUI.
+- Memoization cannot remove these updates, because they are real changes. Cutting further means showing
+  less or refreshing less (product decisions), or a cheaper text path in OpenTUI itself.
+
+Live dashboard after both passes: **3.16%** of a core, 76 MB (macOS, `kestrel sm`, PTY, children
+included).
+
 ## 12. Milestones
 
 Every milestone produces something usable and ends with a review by you. The order follows the dependency

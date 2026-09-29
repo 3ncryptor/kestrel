@@ -26,6 +26,7 @@ bun install
 | `npm run dev` | Same UI with React's development build (clearer errors, ~2× the CPU) |
 | `npm run test:ui` | UI frame tests (Bun + OpenTUI test renderer) |
 | `bun cli/index.js sm --dump --ticks 3` | Headless: prints 3 JSON snapshots of the live system |
+| `NODE_ENV=production bun scripts/bench-ui.jsx` | UI CPU per frame (the real App, headless renderer, realistic ticks) |
 | `bun scripts/bench.js 30` | Engine CPU over 30 s **including the processes it spawns** (ps, lsof…), RSS and tick cost, against the < 1% budget; exits 1 when over |
 | `bun cli/index.js --help` | CLI usage |
 
