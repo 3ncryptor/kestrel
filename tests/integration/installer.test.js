@@ -50,7 +50,7 @@ test('install.sh downloads the release for this machine, verifies it and install
     const bin = path.join(dir, 'home', '.local', 'bin');
     const { status, out } = await install({ HOME: path.join(dir, 'home'), KESTREL_VERSION: `v${VERSION}`, KESTREL_DOWNLOAD_BASE: base });
     assert.equal(status, 0, out);
-    assert.match(out, new RegExp(`Installed kestrel ${VERSION.replace(/\./g, '\\.')} to ${bin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/kestrel`));
+    assert.ok(out.includes(`Installed kestrel ${VERSION} to ${bin}/kestrel`), out);
     assert.equal(execFileSync(path.join(bin, 'kestrel'), { encoding: 'utf-8' }).trim(), `kestrel ${VERSION}`);
     assert.match(out, /not on your PATH/, 'says how to add the directory to PATH');
 });
