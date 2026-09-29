@@ -38,7 +38,7 @@ async function runUi(mode, parsed, io, stack = undefined) {
     // function" (found in M2). `npm start` and the release build set NODE_ENV=production up front.
     // A literal specifier, so `bun build --compile` bundles the UI. It is imported lazily: JSX and
     // OpenTUI only load under Bun, after the checks above (never in the Node test run).
-    // @ts-ignore -- the UI is JSX, outside the type-checked core
+    // @ts-expect-error -- the UI is JSX, outside the type-checked core
     const { runInteractive } = await import('../../ui/main.jsx');
     return runInteractive({
         kestrel,

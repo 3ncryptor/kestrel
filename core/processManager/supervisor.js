@@ -114,7 +114,7 @@ class Supervisor {
             this.ctx.publish({ status: 'errored', pid: null });
             return;
         }
-        resolved.warnings.forEach((w) => this.appendLog(`[kestrel] ${w}`));
+        for (const w of resolved.warnings) this.appendLog(`[kestrel] ${w}`);
         this.ownEnv = resolved.own;
 
         const child = this.ctx.spawnFn(this.def.cmd, {

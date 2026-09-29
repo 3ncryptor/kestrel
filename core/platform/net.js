@@ -5,7 +5,7 @@
  * An interface suffix (`%lo`) is dropped.
  */
 function parseAddress(text) {
-    const match = /^(?:\[([^\]]+)\]|([^:\s\[\]]+)):(\d+)$/.exec(text);
+    const match = /^(?:\[([^\]]+)\]|([^:\s[\]]+)):(\d+)$/.exec(text);
     if (!match) return null;
     const address = (match[1] || match[2]).replace(/%.*$/, '');
     return { address, port: Number(match[3]) };

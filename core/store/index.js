@@ -189,7 +189,7 @@ class Store extends EventEmitter {
             return { ...m, memHistory, leakSuspect: leak.suspect };
         });
         this.commit({ managed });
-        managed.forEach((m) => this.syncLeakAlert(m));
+        for (const m of managed) this.syncLeakAlert(m);
     }
 
     syncLeakAlert(m) {

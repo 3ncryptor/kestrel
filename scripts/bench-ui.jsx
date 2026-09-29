@@ -18,7 +18,10 @@ const CORES = 8;
 
 // A deterministic process table that changes a little every tick, like a real machine.
 let seed = 7;
-const random = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+const random = () => {
+    seed = (seed * 16807) % 2147483647;
+    return seed / 2147483647;
+};
 const names = ['node', 'Chrome Helper (Renderer)', 'WindowServer', 'zsh', 'postgres', 'bun', 'launchd', 'Code Helper', 'python3', 'docker'];
 const base = Array.from({ length: PROCESSES }, (_, i) => ({
     pid: 100 + i, ppid: i < 10 ? 1 : 100 + Math.floor(random() * 10), name: names[i % names.length],

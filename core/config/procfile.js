@@ -10,16 +10,18 @@ function parseProcfile(text) {
     /** @type {Record<string, { cmd: string }>} */
     const processes = {};
     const warnings = [];
-    text.split(/\r?\n/).forEach((raw, index) => {
+    for (const [index, raw] of text.split(/\r?\n/).entries()) {
         const line = raw.trim();
-        if (!line || line.startsWith('#')) return;
+        if (!line || line.startsWith('#')) continue;
         const match = LINE_PATTERN.exec(line);
-        if (!match) return warnings.push({ line: index + 1, message: 'expected "name: command"' });
+        if (!match) {
+            warnings.push({ line: index + 1, message: 'expected "name: command"' });
+            continue;
+        }
         const [, name, cmd] = match;
-        if (name in processes) return warnings.push({ line: index + 1, message: `duplicate process "${name}" ignored` });
-        processes[name] = { cmd: cmd.trim() };
-        return undefined;
-    });
+        if (name in processes) warnings.push({ line: index + 1, message: `duplicate process "${name}" ignored` });
+        else processes[name] = { cmd: cmd.trim() };
+    }
     return { processes, warnings };
 }
 

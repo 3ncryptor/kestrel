@@ -45,7 +45,7 @@ function startWaves(nodes) {
     while (remaining.length) {
         const wave = remaining.filter((n) => n.dependsOn.every((d) => started.has(d))).map((n) => n.name);
         if (!wave.length) throw new Error('startWaves called with a dependency cycle');
-        wave.forEach((name) => started.add(name));
+        for (const name of wave) started.add(name);
         waves.push(wave);
         remaining = remaining.filter((n) => !started.has(n.name));
     }

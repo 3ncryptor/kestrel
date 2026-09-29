@@ -44,7 +44,7 @@ function unsupportedWarnings(name, app) {
     }
     if (app.watch) warnings.push(`${name}: watch is not supported yet; use your tool's own watch mode (e.g. nodemon, tsx watch)`);
     if (app.cron_restart) warnings.push(`${name}: cron_restart is not supported and was skipped`);
-    Object.keys(app).filter((k) => /^env_/.test(k)).forEach((k) => warnings.push(`${name}: ${k} was not imported (put per-environment values in .env files)`));
+    for (const k of Object.keys(app).filter((key) => /^env_/.test(key))) warnings.push(`${name}: ${k} was not imported (put per-environment values in .env files)`);
     return warnings;
 }
 

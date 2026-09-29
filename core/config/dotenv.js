@@ -34,19 +34,25 @@ function parseDotenv(text) {
     /** @type {Record<string, string>} */
     const vars = {};
     const warnings = [];
-    text.split(/\r?\n/).forEach((rawLine, index) => {
+    const warn = (index, message) => warnings.push({ line: index + 1, message });
+    for (const [index, rawLine] of text.split(/\r?\n/).entries()) {
         const line = rawLine.trim();
-        if (!line || line.startsWith('#')) return;
+        if (!line || line.startsWith('#')) continue;
         const body = line.replace(/^export\s+/, '');
         const eq = body.indexOf('=');
-        if (eq === -1) return warnings.push({ line: index + 1, message: 'expected KEY=value' });
+        if (eq === -1) {
+            warn(index, 'expected KEY=value');
+            continue;
+        }
         const key = body.slice(0, eq).trim();
-        if (!KEY_PATTERN.test(key)) return warnings.push({ line: index + 1, message: `invalid variable name "${key}"` });
+        if (!KEY_PATTERN.test(key)) {
+            warn(index, `invalid variable name "${key}"`);
+            continue;
+        }
         const parsed = parseValue(body.slice(eq + 1));
-        if (parsed.error) return warnings.push({ line: index + 1, message: parsed.error });
-        vars[key] = parsed.value;
-        return undefined;
-    });
+        if (parsed.error) warn(index, parsed.error);
+        else vars[key] = parsed.value;
+    }
     return { vars, warnings };
 }
 

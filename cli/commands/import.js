@@ -30,7 +30,7 @@ async function importCommand(parsed, io) {
         }
         writeConfigFile(target, config, { force: true });
         io.stdout.write(`Imported ${processCount(names.length)} from ${source}: ${names.join(', ')}\n`);
-        warnings.forEach((w) => io.stdout.write(`  ! ${w}\n`));
+        for (const w of warnings) io.stdout.write(`  ! ${w}\n`);
         io.stdout.write('Wrote kestrel.json. Nothing was started; review it, then run: kestrel pm\n');
         return 0;
     } finally {

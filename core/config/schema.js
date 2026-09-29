@@ -20,12 +20,15 @@ const isObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v)
 const isPositiveInt = (v) => Number.isInteger(v) && v > 0;
 
 function rejectUnknownKeys(obj, allowed, prefix, add) {
-    Object.keys(obj).filter((k) => !allowed.has(k)).forEach((k) => add(prefix ? `${prefix}.${k}` : k, 'unknown key'));
+    for (const k of Object.keys(obj)) if (!allowed.has(k)) add(prefix ? `${prefix}.${k}` : k, 'unknown key');
 }
 
 function normalizeEnv(env, p, add) {
     if (env === undefined) return {};
-    if (!isObject(env)) return add(p, 'must be an object of NAME: value pairs'), {};
+    if (!isObject(env)) {
+        add(p, 'must be an object of NAME: value pairs');
+        return {};
+    }
     const out = {};
     for (const [key, value] of Object.entries(env)) {
         if (!['string', 'number', 'boolean'].includes(typeof value)) add(`${p}.${key}`, 'must be a string, number or boolean');
@@ -36,10 +39,16 @@ function normalizeEnv(env, p, add) {
 
 function normalizeReady(ready, p, add) {
     if (ready === undefined) return null;
-    if (!isObject(ready)) return add(p, 'must be an object like { "port": 3000 }'), null;
+    if (!isObject(ready)) {
+        add(p, 'must be an object like { "port": 3000 }');
+        return null;
+    }
     const kinds = READY_KINDS.filter((k) => k in ready);
     rejectUnknownKeys(ready, new Set([...READY_KINDS, 'timeoutMs']), p, add);
-    if (kinds.length !== 1) return add(p, 'must contain exactly one of "port", "http" or "log"'), null;
+    if (kinds.length !== 1) {
+        add(p, 'must contain exactly one of "port", "http" or "log"');
+        return null;
+    }
     const kind = kinds[0];
     const target = ready[kind];
     if (kind === 'port' && !(Number.isInteger(target) && target > 0 && target <= MAX_PORT)) add(`${p}.port`, `must be a port number (1-${MAX_PORT})`);
@@ -72,7 +81,10 @@ function checkInt(value, p, add, fallback, { min = 1 } = {}) {
 function normalizeProcess(name, raw, baseDir, add) {
     const p = `processes.${name}`;
     if (!isValidName(name)) add(p, 'names may only use letters, digits, ".", "_" and "-" (max 64)');
-    if (!isObject(raw)) return add(p, 'must be an object like { "cmd": "npm start" }'), null;
+    if (!isObject(raw)) {
+        add(p, 'must be an object like { "cmd": "npm start" }');
+        return null;
+    }
     rejectUnknownKeys(raw, PROCESS_KEYS, p, add);
     if (raw.cmd === undefined) add(`${p}.cmd`, 'required');
     else if (typeof raw.cmd !== 'string' || !raw.cmd.trim()) add(`${p}.cmd`, 'must be a non-empty command');
@@ -125,7 +137,10 @@ function checkDependencies(processes, add) {
 
 function normalizeThresholds(raw, add) {
     if (raw === undefined) return { ...DEFAULT_THRESHOLDS };
-    if (!isObject(raw)) return add('monitor.thresholds', 'must be an object'), { ...DEFAULT_THRESHOLDS };
+    if (!isObject(raw)) {
+        add('monitor.thresholds', 'must be an object');
+        return { ...DEFAULT_THRESHOLDS };
+    }
     rejectUnknownKeys(raw, new Set(['cpu', 'memMB']), 'monitor.thresholds', add);
     const pair = (key) => {
         const value = raw[key];
@@ -139,7 +154,10 @@ function normalizeThresholds(raw, add) {
 
 function normalizeMonitor(raw, add) {
     if (raw === undefined) return { intervalMs: DEFAULTS.intervalMs, thresholds: { ...DEFAULT_THRESHOLDS } };
-    if (!isObject(raw)) return add('monitor', 'must be an object'), { intervalMs: DEFAULTS.intervalMs, thresholds: { ...DEFAULT_THRESHOLDS } };
+    if (!isObject(raw)) {
+        add('monitor', 'must be an object');
+        return { intervalMs: DEFAULTS.intervalMs, thresholds: { ...DEFAULT_THRESHOLDS } };
+    }
     rejectUnknownKeys(raw, new Set(['intervalMs', 'thresholds']), 'monitor', add);
     const intervalMs = raw.intervalMs ?? DEFAULTS.intervalMs;
     const [min, max] = INTERVAL_RANGE;

@@ -15,7 +15,7 @@ const processCount = (n) => `${n} process${n === 1 ? '' : 'es'}`;
 
 function fromProcfile(file, io) {
     const { processes, warnings } = parseProcfile(fs.readFileSync(file, 'utf-8'));
-    warnings.forEach((w) => io.stdout.write(`  ! Procfile line ${w.line}: ${w.message}\n`));
+    for (const w of warnings) io.stdout.write(`  ! Procfile line ${w.line}: ${w.message}\n`);
     if (!Object.keys(processes).length) return null;
     io.stdout.write('Using the Procfile.\n');
     return { version: 1, processes };
@@ -35,7 +35,7 @@ async function fromPackageJson(file, prompter, io) {
     if (!scripts.length) return null;
     const width = Math.max(...scripts.map((s) => s.name.length));
     io.stdout.write(`package.json scripts (run with ${runner}):\n`);
-    scripts.forEach((s, i) => io.stdout.write(`  ${i + 1}. [${s.preselected ? 'x' : ' '}] ${s.name.padEnd(width)}  ${s.command}\n`));
+    for (const [i, s] of scripts.entries()) io.stdout.write(`  ${i + 1}. [${s.preselected ? 'x' : ' '}] ${s.name.padEnd(width)}  ${s.command}\n`);
     const defaults = scripts.flatMap((s, i) => (s.preselected ? [i + 1] : []));
     const answer = (await prompter.ask(`Scripts to run, e.g. 1,3 [${defaults.join(',') || 'none'}]: `)) ?? '';
     const picked = answer.trim() ? parseChoice(answer, scripts.length) : defaults;

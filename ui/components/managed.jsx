@@ -53,7 +53,7 @@ export function ManagedBox({ state, layout, focused, hints, now }) {
     const title = stack.name ? `managed · ${stack.name}` : 'managed';
     const info = managed.length ? [{ text: readySummary(managed), role: 'muted' }] : [];
     const nameWidth = Math.min(MAX_NAME, Math.max(MIN_NAME, ...managed.map((m) => m.id.length)));
-    const selectedIndex = Math.max(0, managed.findIndex((m) => m === selected));
+    const selectedIndex = Math.max(0, managed.indexOf(selected));
     const start = windowStart(selectedIndex, managed.length, rows);
     return (
         <Box title={title} accent="managed" info={info} hints={hints} focused={focused} width={layout.width} height={layout.height}>

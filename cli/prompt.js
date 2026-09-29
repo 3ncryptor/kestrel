@@ -43,8 +43,14 @@ function createPrompter({ stdin, stdout }) {
 /** `--yes`: every question takes its default; confirmations are agreed to. @returns {Prompter} */
 function createAutoPrompter({ stdout }) {
     return {
-        ask: async (question) => (stdout.write(`${question}(default)\n`), ''),
-        confirm: async (question) => (stdout.write(`${question} yes (--yes)\n`), true),
+        ask: async (question) => {
+            stdout.write(`${question}(default)\n`);
+            return '';
+        },
+        confirm: async (question) => {
+            stdout.write(`${question} yes (--yes)\n`);
+            return true;
+        },
         close: () => {},
     };
 }

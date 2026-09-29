@@ -173,9 +173,9 @@ function buildTree(processes, { sortBy, sortDir, filterQuery, collapsedPids }) {
         const isCollapsed = collapsed.has(pid) && kids.length > 0;
         const descendantCount = sizeOf(pid) - 1;
         rows.push({ ...byPid.get(pid), depth, hasChildren: kids.length > 0, collapsed: isCollapsed, descendantCount });
-        if (!isCollapsed) kids.forEach((kid) => visit(kid, depth + 1));
+        if (!isCollapsed) for (const kid of kids) visit(kid, depth + 1);
     };
-    roots.forEach((root) => visit(root.pid, 0));
+    for (const root of roots) visit(root.pid, 0);
     return rows;
 }
 

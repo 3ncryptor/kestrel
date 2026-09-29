@@ -150,10 +150,10 @@ function createStackSession({ store, pm, stack, cwd, previousRun, isAlive }) {
         // Only a verified group leader has its whole group signalled.
         const signal = (o, sig) => (o.pgid === o.pid ? signalPgid(o.pgid, sig) : signalPid(o.pid, sig));
         const alive = (o) => (o.pgid === o.pid ? groupAlive(o.pgid) : isAlive(o.pid));
-        orphans.forEach((o) => signal(o, 'SIGTERM'));
+        for (const o of orphans) signal(o, 'SIGTERM');
         const deadline = Date.now() + ORPHAN_GRACE_MS;
         while (orphans.some(alive) && Date.now() < deadline) await sleep(ORPHAN_POLL_MS);
-        orphans.filter(alive).forEach((o) => signal(o, 'SIGKILL'));
+        for (const o of orphans.filter(alive)) signal(o, 'SIGKILL');
         forgetOrphans();
         return { stopped: orphans.length };
     }
