@@ -193,6 +193,13 @@ html[data-effects="off"] .wm-lit {
         opacity: 0;
     }
 }
+/* The Spotlight bar: it settles into place from slightly larger, as macOS's does. */
+@keyframes spotlight-in {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 0) scale(1.03);
+    }
+}
 @keyframes palette-in {
     from {
         opacity: 0;

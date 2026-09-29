@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMotionGate } from '@/components/motion/useMotionGate';
 import { cn } from '@/lib/cn';
-import { filledRows, graphRowLevel, type HeroGrid as Grid, heroGrid, initialSeries, type Level, nextSample, seeded } from '@/lib/wordmark';
+import { filledRows, type HeroGrid as Grid, graphRowLevel, heroGrid, initialSeries, type Level, nextSample, seeded } from '@/lib/wordmark';
 
 /** One cell's pitch in viewBox units, and the cell inside it (the rest is the gap). */
 const PITCH = 10;
