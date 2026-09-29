@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env -S NODE_ENV=production bun
 // Kestrel CLI entry point: parse, dispatch, exit code. 0 = ok, 1 = runtime error, 2 = usage error.
 const { parseCli, UsageError } = require('./args');
 const { help } = require('./commands/help');
