@@ -170,18 +170,6 @@ html.lenis {
         opacity: 0;
     }
 }
-/* The footer's mark: the same cells, dimmed, brightening under the pointer. */
-.wm-dim {
-    opacity: 0.28;
-    transition: opacity 900ms ease-out;
-}
-.wm-dim:hover {
-    opacity: 1;
-    transition-duration: 0ms;
-}
-.wm-faint {
-    fill: #141417;
-}
 /* The project menu's "Effects off" (set before first paint by the script in layout.tsx). */
 html[data-effects="off"] .wm-lit {
     animation: none;
