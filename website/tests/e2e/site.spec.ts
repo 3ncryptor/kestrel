@@ -47,29 +47,45 @@ test('an unknown page is a real 404', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible();
 });
 
-test('the hero replays the real dashboard, one frame a second', async ({ page }) => {
+test('the hero is the name, with a CPU graph that moves once a second', async ({ page }) => {
     await page.goto('/');
-    // It only plays while on screen (it pauses when scrolled away), so bring it into view.
-    await page.getByText('Rendered by Kestrel').scrollIntoViewIfNeeded();
-    const status = page.locator('[aria-live="polite"]', { hasText: /live · \d+\/30/ });
-    await expect(status).toBeVisible({ timeout: 10_000 });
-    const first = await status.textContent();
-    await expect.poll(async () => status.textContent(), { timeout: 5_000 }).not.toBe(first);
+    await expect(page.getByRole('heading', { level: 1, name: /Kestrel: htop and pm2/ })).toBeVisible();
+    const bars = page.locator('h1 svg:visible .wm-bar');
+    const before = await bars.evaluateAll((els) => els.map((e) => `${e.getAttribute('x')},${e.getAttribute('y')}`).join());
+    await expect.poll(async () => bars.evaluateAll((els) => els.map((e) => `${e.getAttribute('x')},${e.getAttribute('y')}`).join()), { timeout: 5_000 }).not.toBe(before);
 });
 
-test('with reduced motion the hero holds still', async ({ page }) => {
+/** The text of the dashboard frame on screen. */
+const frameText = (page: Page) => page.locator('[data-terminal-frame]').first().innerText();
+
+test('how it works replays the real dashboard, and the crash and its recovery', async ({ page }) => {
+    await page.setViewportSize({ width: 900, height: 900 }); // below the pinned layout: the steps are plain tabs
+    await page.goto('/');
+    const tabs = page.getByRole('tablist', { name: 'How it works' });
+    // The replay only plays while the section is on screen, so bring it into view.
+    await tabs.scrollIntoViewIfNeeded();
+    await tabs.getByRole('tab', { name: /Run it/ }).click();
+    await expect(page.locator('[data-terminal-frame]')).toBeVisible();
+    const first = await frameText(page);
+    await expect.poll(() => frameText(page), { timeout: 5_000 }).not.toBe(first);
+    await tabs.getByRole('tab', { name: /Crash & recover/ }).click();
+    await expect.poll(() => frameText(page), { timeout: 10_000 }).toContain('[kestrel] crashed (code 1, signal null)');
+    await expect(page.getByRole('button', { name: 'Crash it again' })).toBeVisible();
+});
+
+test('with reduced motion nothing plays: the hero graph and the dashboard hold still', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 900, height: 900 });
     await page.goto('/');
-    await expect(page.getByText('paused', { exact: true })).toBeVisible({ timeout: 10_000 });
-});
-
-test('the colour and width controls switch to real captures', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('switch', { name: /Colour/ }).press('Space');
-    await expect(page.getByText('NO_COLOR mode')).toBeVisible();
-    await page.getByRole('switch', { name: /Colour/ }).press('Space');
-    await page.getByRole('slider', { name: 'Terminal width' }).press('ArrowRight');
-    await expect(page.getByText('kestrel pm — myapp — 150×34')).toBeVisible();
+    const bars = page.locator('h1 svg:visible .wm-bar');
+    const graph = await bars.evaluateAll((els) => els.length);
+    await page.getByRole('tablist', { name: 'How it works' }).scrollIntoViewIfNeeded();
+    await page.getByRole('tab', { name: /Crash & recover/ }).click();
+    const still = await frameText(page);
+    expect(still).toContain('retry');
+    await page.waitForTimeout(2_500);
+    expect(await frameText(page)).toBe(still);
+    expect(graph).toBeGreaterThan(0);
 });
 
 test('install tabs follow the tabs pattern and copy with a toast', async ({ page, context }) => {

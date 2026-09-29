@@ -14,6 +14,12 @@ export const STILLS: Record<'compact' | 'wide' | 'mono', Frame> = {
     mono: decodeFirst(asFrames(mono)),
 };
 
+/** The scripted replay (scripts/website/scenario.js): the worker crashes at tick 12 and is ready again at 18. */
+export const CRASH_FROM = 10;
+export const CRASH_TO = 19;
+/** The frame shown when nothing moves: the retry countdown, which tells the story in one picture. */
+export const CRASH_STILL = 13;
+
 /** The 30 animated frames, loaded after the page is interactive (a separate chunk). */
 export async function loadStandardFrames(): Promise<EncodedFrames> {
     const module = await import('@/generated/hero-standard.json');

@@ -144,40 +144,34 @@ html.lenis {
     100% { transform: translate(64px, 45px); }
 }
 
-/* The hero wordmark (MeterWordmark): meter cells that fill left to right, flicker, and trail the pointer. */
+/* The hero grid (HeroGrid): meter cells. The word fills in left to right from the first paint, the graph's bars
+   repaint each second, and the pointer leaves a fading trail on the empty track. */
+.wm-empty,
+.wm-slot {
+    fill: #1d1e22;
+}
 .wm-empty {
-    fill: #17171a;
     transition: fill 900ms ease-out;
 }
 .wm-empty:hover {
-    fill: color-mix(in srgb, var(--k-green) 38%, #17171a);
+    fill: color-mix(in srgb, var(--k-green) 40%, #1d1e22);
     transition-duration: 0ms;
+}
+/* Bars repaint instantly, as the terminal does (easing between colours passes through brown), and sit a step
+   behind the word. */
+.wm-bar {
+    opacity: 0.6;
 }
 .wm-lit {
     animation: wm-fill 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.wm-flicker {
-    animation: wm-flicker 6s linear infinite;
 }
 @keyframes wm-fill {
     from {
         opacity: 0;
     }
 }
-@keyframes wm-flicker {
-    0%,
-    100% {
-        fill: #17171a;
-    }
-    3% {
-        fill: color-mix(in srgb, var(--k-green) 30%, #17171a);
-    }
-    9% {
-        fill: #17171a;
-    }
-}
 /* The project menu's "Effects off" (set before first paint by the script in layout.tsx). */
-html[data-effects="off"] :where(.wm-lit, .wm-flicker) {
+html[data-effects="off"] .wm-lit {
     animation: none;
 }
 
