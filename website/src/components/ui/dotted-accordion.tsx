@@ -160,7 +160,7 @@ export const DottedAccordion = forwardRef<HTMLDivElement, DottedAccordionProps>(
                     className="group flex w-full cursor-pointer items-center justify-between px-5 py-4 text-left rounded-none transition-colors outline-none focus-visible:ring-1 focus-visible:ring-foreground/30 dark:focus-visible:ring-white/30"
                   >
                     <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                      <span className="font-mono text-xs text-zinc-400 group-hover:text-zinc-600 dark:text-zinc-500 dark:group-hover:text-zinc-400 transition-colors shrink-0 w-5">
+                      <span className="font-mono text-xs text-zinc-400 group-hover:text-zinc-600 dark:text-zinc-400 dark:group-hover:text-zinc-300 transition-colors shrink-0 w-5">
                         {String(index + 1).padStart(2, "0")}
                       </span>
                       <span

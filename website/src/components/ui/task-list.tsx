@@ -438,6 +438,7 @@ export function TaskList({
     : current;
 
   return (
+    <>
     <ul
       data-slot="task-list"
       className={cn(
@@ -475,10 +476,12 @@ export function TaskList({
           />
         </motion.li>
       ))}
-      <li role="status" aria-live="polite" className="sr-only">
-        {announcement}
-      </li>
     </ul>
+    {/* Outside the list: a live region inside <ul> would be a non-item child (invalid list markup). */}
+    <p role="status" aria-live="polite" className="sr-only">
+      {announcement}
+    </p>
+    </>
   );
 }
 
