@@ -110,7 +110,7 @@ function fakeExec(outputs) {
 
 test('adapter.listProcesses runs ps without a shell and parses the result', async () => {
     const { exec, calls } = fakeExec({ ps: fixture('ps.txt') });
-    const adapter = darwin.createDarwinAdapter({ exec, now: () => NOW });
+    const adapter = darwin.createDarwinAdapter({ native: null, exec, now: () => NOW });
     const procs = await adapter.listProcesses();
     assert.equal(calls[0][0], 'ps');
     assert.ok(calls[0].includes('-A'));
@@ -119,7 +119,7 @@ test('adapter.listProcesses runs ps without a shell and parses the result', asyn
 
 test('adapter.memory combines vm_stat, total memory and swap usage', async () => {
     const { exec } = fakeExec({ vm_stat: fixture('vm_stat.txt'), sysctl: fixture('sysctl_swap.txt') });
-    const adapter = darwin.createDarwinAdapter({ exec, totalMemBytes: 8 * 1024 ** 3 });
+    const adapter = darwin.createDarwinAdapter({ native: null, exec, totalMemBytes: 8 * 1024 ** 3 });
     // cache = file-backed pages 49415 × 16 KiB
     assert.deepEqual(await adapter.memory(), { totalMB: 8192, usedMB: 6741, cachedMB: 772, swapUsedMB: 4863, swapTotalMB: 6144 });
 });
@@ -127,7 +127,7 @@ test('adapter.memory combines vm_stat, total memory and swap usage', async () =>
 test('adapter.memory spawns sysctl for swap at most every 5 s (total memory never changes)', async () => {
     let clock = 0;
     const { exec, calls } = fakeExec({ vm_stat: fixture('vm_stat.txt'), sysctl: fixture('sysctl_swap.txt') });
-    const adapter = darwin.createDarwinAdapter({ exec, totalMemBytes: 8 * 1024 ** 3, now: () => clock });
+    const adapter = darwin.createDarwinAdapter({ native: null, exec, totalMemBytes: 8 * 1024 ** 3, now: () => clock });
     for (let i = 0; i < 6; i++) {
         await adapter.memory();
         clock += 1000;
@@ -138,8 +138,8 @@ test('adapter.memory spawns sysctl for swap at most every 5 s (total memory neve
 
 test('adapter.listeningPorts marks results partial when not root', async () => {
     const { exec } = fakeExec({ lsof: fixture('lsof.txt') });
-    const user = await darwin.createDarwinAdapter({ exec, isRoot: false }).listeningPorts();
-    const root = await darwin.createDarwinAdapter({ exec, isRoot: true }).listeningPorts();
+    const user = await darwin.createDarwinAdapter({ native: null, exec, isRoot: false }).listeningPorts();
+    const root = await darwin.createDarwinAdapter({ native: null, exec, isRoot: true }).listeningPorts();
     assert.equal(user.partial, true);
     assert.equal(root.partial, false);
     assert.ok(user.items.length > 0);
@@ -148,7 +148,7 @@ test('adapter.listeningPorts marks results partial when not root', async () => {
 test('adapter.listeningPorts treats lsof exit code 1 with no output as "no listeners"', async () => {
     const noMatches = Object.assign(new Error('Command failed'), { code: 1, stdout: '' });
     const { exec } = fakeExec({ lsof: noMatches });
-    const result = await darwin.createDarwinAdapter({ exec, isRoot: true }).listeningPorts();
+    const result = await darwin.createDarwinAdapter({ native: null, exec, isRoot: true }).listeningPorts();
     assert.deepEqual(result, { items: [], partial: false });
 });
 
@@ -156,16 +156,45 @@ test('adapter surfaces a missing tool as a PlatformError', async () => {
     const missing = Object.assign(new Error('spawn lsof ENOENT'), { code: 'ENOENT' });
     const { exec } = fakeExec({ lsof: missing });
     await assert.rejects(
-        () => darwin.createDarwinAdapter({ exec }).listeningPorts(),
+        () => darwin.createDarwinAdapter({ native: null, exec }).listeningPorts(),
         (err) => err.name === 'PlatformError' && err.code === 'ENOTOOL' && /lsof/.test(err.message)
     );
 });
 
 test('adapter exposes per-core CPU times and load average from os', () => {
-    const adapter = darwin.createDarwinAdapter({ exec: async () => ({ stdout: '' }) });
+    const adapter = darwin.createDarwinAdapter({ native: null, exec: async () => ({ stdout: '' }) });
     const cores = adapter.cpuTimes();
     assert.ok(cores.length > 0);
     assert.equal(typeof cores[0].idle, 'number');
     assert.equal(adapter.loadAverage().length, 3);
     assert.equal(adapter.id, 'darwin');
+});
+
+test('the adapter samples natively when the native layer loads, with nanosecond cpu time', async () => {
+    const native = {
+        listPids: () => [100],
+        taskInfo: () => ({ ppid: 1, uid: 501, status: 2, running: 0, comm: 'node', name: 'node', startSec: 1, startUsec: 0, rssBytes: 1024, cpuNs: 5 }),
+        shortInfo: () => null,
+        path: () => '/usr/local/bin/node',
+        userName: () => 'alice',
+    };
+    const exec = async () => {
+        throw new Error('ps must not run when every process is ours');
+    };
+    const adapter = darwin.createDarwinAdapter({ native, exec });
+    assert.equal(adapter.sampling, 'native');
+    assert.equal(adapter.clockTicks, 1e9);
+    assert.deepEqual((await adapter.listProcesses()).map((p) => [p.pid, p.cpuTicks]), [[100, 5]]);
+    assert.equal(darwin.createDarwinAdapter({ native: null, exec }).sampling, 'ps');
+});
+
+test('KESTREL_NATIVE=0 forces the ps/lsof path (a troubleshooting switch)', () => {
+    const before = process.env.KESTREL_NATIVE;
+    process.env.KESTREL_NATIVE = '0';
+    try {
+        assert.equal(darwin.createDarwinAdapter({ exec: async () => ({ stdout: '' }) }).sampling, 'ps');
+    } finally {
+        if (before === undefined) delete process.env.KESTREL_NATIVE;
+        else process.env.KESTREL_NATIVE = before;
+    }
 });

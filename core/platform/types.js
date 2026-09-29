@@ -5,8 +5,8 @@
  */
 
 /**
- * One OS process as reported by an adapter. Exactly one of `cpuPercent` (macOS, from ps)
- * or `cpuTicks` (Linux, cumulative utime+stime) is set; the sampler turns either into `cpu`.
+ * One OS process as reported by an adapter. Exactly one of `cpuPercent` (from ps) or `cpuTicks`
+ * (cumulative CPU time: Linux /proc, native macOS) is set; the sampler turns either into `cpu`.
  * @typedef {Object} ProcessInfo
  * @property {number} pid
  * @property {number} ppid
@@ -62,7 +62,8 @@
  * @property {() => Promise<PortsResult>} listeningPorts
  * @property {() => CpuTimes[]} cpuTimes
  * @property {() => number[]} loadAverage
- * @property {number} [clockTicks]  Linux only: USER_HZ, for converting cpuTicks to seconds
+ * @property {number} [clockTicks]  units of cpuTicks per second (Linux: USER_HZ; native macOS: 1e9, ns)
+ * @property {'native'|'ps'} [sampling]  macOS: libproc via FFI, or the ps/lsof fallback (M4)
  */
 
 /**

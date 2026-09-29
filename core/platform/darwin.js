@@ -4,6 +4,8 @@ const os = require('os');
 const util = require('util');
 const { toolError } = require('./errors');
 const parsers = require('./darwinParsers');
+const { createNativeSource } = require('./darwinNative');
+const { loadDarwinNative } = require('./darwinFfi');
 const {
     PS_ARGS, LSOF_ARGS, BYTES_PER_MB, parsePsOutput, parseVmStat, memoryUsedMB, cachedMB, parseSwapUsage, parseSwapTotal, parseLsof,
 } = parsers;
@@ -27,8 +29,11 @@ async function run(exec, tool, args) {
     }
 }
 
+/** libproc via Bun's FFI, unless disabled with KESTREL_NATIVE=0 (then ps/lsof, as under Node). */
+const defaultNative = () => (process.env.KESTREL_NATIVE === '0' ? null : loadDarwinNative());
+
 /**
- * @param {{ exec?: ExecFn, now?: () => number, isRoot?: boolean, totalMemBytes?: number }} [deps]
+ * @param {{ exec?: ExecFn, now?: () => number, isRoot?: boolean, totalMemBytes?: number, native?: any }} [deps]
  * @returns {import('./types').PlatformAdapter}
  */
 function createDarwinAdapter({
@@ -36,7 +41,9 @@ function createDarwinAdapter({
     now = Date.now,
     isRoot = process.getuid?.() === 0,
     totalMemBytes = os.totalmem(), // constant: no need to spawn sysctl for it every tick
+    native = defaultNative(),
 } = {}) {
+    if (native) return nativeAdapter({ native, exec, now, isRoot, totalMemBytes });
     let swap = { usedMB: 0, totalMB: 0 };
     let swapAt = -Infinity;
 
@@ -51,6 +58,7 @@ function createDarwinAdapter({
 
     return {
         id: 'darwin',
+        sampling: 'ps',
         async listProcesses() {
             return parsePsOutput(await run(exec, 'ps', PS_ARGS), now());
         },
@@ -76,6 +84,24 @@ function createDarwinAdapter({
             }
             return { items: parseLsof(text), partial: !isRoot };
         },
+        cpuTimes: () => os.cpus().map((cpu) => ({ ...cpu.times })),
+        loadAverage: () => os.loadavg(),
+    };
+}
+
+/**
+ * The same adapter backed by libproc and Mach calls (darwinNative.js): no process spawned per tick.
+ * @returns {import('./types').PlatformAdapter}
+ */
+function nativeAdapter({ native, exec, now, isRoot, totalMemBytes }) {
+    const source = createNativeSource({ native, exec, now });
+    return {
+        id: 'darwin',
+        sampling: 'native',
+        clockTicks: source.clockTicks,
+        listProcesses: () => source.listProcesses(),
+        memory: async () => source.memory(totalMemBytes),
+        listeningPorts: async () => source.listeningPorts({ isRoot }),
         cpuTimes: () => os.cpus().map((cpu) => ({ ...cpu.times })),
         loadAverage: () => os.loadavg(),
     };
