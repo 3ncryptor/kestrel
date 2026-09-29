@@ -60,13 +60,18 @@ async function detect(cwd, prompter, io) {
 /** Logs and run state live in .kestrel/: offer to keep them out of git (only in a git project). */
 async function offerGitignore(cwd, prompter, io) {
     const file = path.join(cwd, '.gitignore');
-    const exists = fs.existsSync(file);
-    if (!exists && !fs.existsSync(path.join(cwd, '.git'))) return;
-    const content = exists ? fs.readFileSync(file, 'utf-8') : '';
-    if (/^\/?\.kestrel\/?\s*$/m.test(content)) return;
+    let content = null;
+    try {
+        content = fs.readFileSync(file, 'utf-8');
+    } catch (err) {
+        if (err.code !== 'ENOENT') throw err;
+    }
+    if (content === null && !fs.existsSync(path.join(cwd, '.git'))) return;
+    if (/^\/?\.kestrel\/?\s*$/m.test(content || '')) return;
     if (!(await prompter.confirm('Add .kestrel/ (logs and run state) to .gitignore?', true))) return;
+    // Append, never rewrite: an edit made to .gitignore meanwhile is kept.
     const separator = content && !content.endsWith('\n') ? '\n' : '';
-    fs.writeFileSync(file, `${content}${separator}${IGNORE_ENTRY}\n`);
+    fs.appendFileSync(file, `${separator}${IGNORE_ENTRY}\n`);
     io.stdout.write('Added .kestrel/ to .gitignore\n');
 }
 
