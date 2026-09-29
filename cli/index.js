@@ -4,12 +4,12 @@ const { parseCli, UsageError } = require('./args');
 const { help } = require('./commands/help');
 const { version } = require('./commands/version');
 const { sm } = require('./commands/sm');
-const { pending } = require('./commands/stubs');
 const { dashboard } = require('./commands/interactive');
 const { pm } = require('./commands/pm');
 const { init } = require('./commands/init');
 const { importCommand } = require('./commands/import');
 const { update } = require('./commands/update');
+const { doctor } = require('./commands/doctor');
 
 const HANDLERS = {
     help,
@@ -19,7 +19,7 @@ const HANDLERS = {
     pm,
     init,
     import: importCommand,
-    doctor: pending('doctor'),
+    doctor,
     update,
 };
 

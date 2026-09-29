@@ -75,15 +75,6 @@ test('main reports usage errors on stderr with exit code 2', async () => {
     assert.match(f.err(), /kestrel --help/);
 });
 
-test('commands that arrive in later milestones say so and exit 1', async () => {
-    const cases = [[['doctor'], /M4/]];
-    for (const [argv, pattern] of cases) {
-        const f = fakeIo();
-        assert.equal(await main(argv, f.io), 1, argv.join(' '));
-        assert.match(f.err(), pattern, argv.join(' '));
-    }
-});
-
 test('the interactive UI refuses cleanly without Bun or without a terminal', async () => {
     for (const argv of [[], ['sm'], ['-sm']]) {
         const f = fakeIo();
