@@ -61,27 +61,46 @@ project's processes, the way pm2 or foreman do. Because it does both, it can tel
 
 ## Getting started
 
-> Kestrel isn't released yet. Binaries, an installer, npm and Homebrew packages are prepared in this
+> Kestrel isn't released yet: the binaries, installer, npm and Homebrew packages are prepared in this
 > repository but not published. Until then, run it from source.
-
-You need [Bun](https://bun.sh) 1.4 (and Node.js 20+ if you want to run the tests).
 
 ```sh
 git clone https://github.com/3ncryptor/kestrel.git && cd kestrel
-bun install
-npm start                  # the dashboard
-npm start -- pm --config tests/fixtures/stack/kestrel.json   # a demo stack
+./setup.sh                 # macOS, Linux, Windows WSL2   ·   PowerShell: .\setup.ps1
+npm run demo               # the process manager on a demo stack
 ```
 
-To get a standalone `kestrel` binary for your machine:
-
-```sh
-bun run build              # dist/kestrel-<os>-<arch>, smoke-tested
-cp dist/kestrel-* ~/.local/bin/kestrel
-kestrel doctor             # checks the machine, the terminal and the project's config
-```
+`setup.sh` checks and installs what's needed (Bun, the dependencies, a git hook, a `kestrel` command
+linked to your checkout) and verifies everything. `./setup.sh --check` only reports. On Windows, the
+full setup runs inside WSL2; Git Bash covers editing, lint and the type check.
 
 ## Commands
+
+### While developing (from a source checkout)
+
+| What | With npm | With the `kestrel` command (after `./setup.sh`) |
+|---|---|---|
+| The dashboard | `npm start` | `kestrel` |
+| The process manager for the project in this folder | `npm run pm` | `kestrel pm` |
+| The process manager on the demo stack | `npm run demo` | `kestrel pm --config tests/fixtures/stack/kestrel.json` |
+| The system monitor only | `npm run sm` | `kestrel sm` |
+| Check the machine and the config | `npm run doctor` | `kestrel doctor` |
+| Write a `kestrel.json` | `npm start -- init` | `kestrel init` |
+| The dashboard with React's development build | `npm run dev` | — |
+
+**npm keeps the flags that come before `--` for itself.** `npm start --pm` opens the plain dashboard,
+because npm took `--pm`. Put Kestrel's flags after `--`: `npm start -- pm --config kestrel.json` or
+`npm run pm -- --only api,web`. The `kestrel` command has no such catch.
+
+### After a release
+
+Planned installs, not published yet:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/3ncryptor/kestrel/main/packaging/install.sh | sh
+npm install -g kestrel-tui
+brew install 3ncryptor/tap/kestrel
+```
 
 | Command | What it does |
 |---|---|
@@ -93,7 +112,18 @@ kestrel doctor             # checks the machine, the terminal and the project's 
 | `kestrel doctor` | Checks what Kestrel needs here and says how to fix what is missing |
 | `kestrel update` | Updates a standalone install to the latest release (checksum-verified) |
 
-`-pm`, `--pm`, `-sm` and `--sm` also work. Press `?` in the dashboard for every key.
+`-pm`, `--pm`, `-sm` and `--sm` also work.
+
+### What the process manager looks like
+
+The process manager is part of the dashboard, not a separate screen. `kestrel pm` opens the dashboard
+with the stack starting and the **managed box** (left column) focused. While it has focus, the big
+panel shows that process's **logs** instead of the process table. Keys:
+- `↑↓` pick a process; `s` start, `x` stop, `r` restart, `a` start all.
+- `v` shows every process's logs interleaved; `/` searches.
+- `Tab` moves on to ports, then back to the process table.
+
+Press `?` anywhere for every key.
 
 ## A stack
 
