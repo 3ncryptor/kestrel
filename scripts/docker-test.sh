@@ -19,7 +19,7 @@ if ! command -v node >/dev/null 2>&1; then
 fi
 echo "node $(node --version) on $(. /etc/os-release && echo "$PRETTY_NAME")"
 echo "ss: $(command -v ss || echo missing, /proc/net/tcp fallback will be used)"
-node --test --test-timeout=20000 tests/unit tests/integration 2>&1 | grep -E "^# (tests|pass|fail)"
+node --test --test-timeout=20000 tests/unit/*.test.js tests/integration/*.test.js 2>&1 | grep -E "^# (tests|pass|fail)"
 node cli/index.js sm --dump --ticks 3 --interval 500 | tail -1 | node -e "
   let d = \"\"; process.stdin.on(\"data\", (c) => (d += c)).on(\"end\", () => {
     const s = JSON.parse(d);
