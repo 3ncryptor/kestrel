@@ -1,11 +1,12 @@
 # The Kestrel website
 
 The landing page and docs at **https://kestrel-tui.vercel.app**, built with Next.js 16 (App Router), Tailwind 4,
-Motion and GSAP, and components from [DevClub UI](https://www.npmjs.com/package/@devclubnst/ui). Every page is
+Motion, GSAP and Lenis, and components from [DevClub UI](https://www.npmjs.com/package/@devclubnst/ui). Every page is
 statically prerendered.
 
-**The rule the site follows:** everything on it that looks like Kestrel *is* Kestrel. The dashboard in the hero and the
-tour, the `--help` text, the `kestrel init` output, the keys page and the colours are captured from the product,
+**The rule the site follows:** everything on it that looks like Kestrel *is* Kestrel. The dashboard and the crash in
+"How it works", the quit dialog (press `q`), the `--help` text, the `kestrel init` output, the keys page, the colours
+and the hero's meter bands are captured from the product,
 not drawn by hand.
 
 ## Two stages
@@ -53,12 +54,14 @@ bun run build && bun run test:e2e   # Playwright + axe against the production bu
   URI, and HSTS.
 - **Markdown** from the repository is rendered at build time with raw HTML dropped; a test proves that script and
   event-handler markup never reach a page.
-- **Motion** respects `prefers-reduced-motion` everywhere:
-  - the hero holds still;
-  - the tour doesn't pin;
-  - the WebGL backdrop doesn't load.
+- **Motion** goes through one gate (`src/components/motion/useMotionGate.ts`): `prefers-reduced-motion` turns it off
+  everywhere:
+  - no Lenis smoothing, text reveals or pinning;
+  - the hero's CPU graph and the dashboard replay hold still.
 
-  The hero also pauses off-screen and in hidden tabs.
+  The graph and the replay also pause off-screen and in hidden tabs.
+- **Search** (⌘K or `/`) is DevClub's spotlight search, shown like macOS Spotlight. Its index is a static
+  `/search.json` built with the site, fetched the first time search opens.
 - **Accessibility:**
   - axe (WCAG 2.1 AA) runs on every route in CI. The captured terminal frames are excluded, because they're the
     product's own output: `aria-hidden`, with a text alternative.
