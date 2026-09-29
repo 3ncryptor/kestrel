@@ -22,6 +22,7 @@ skipped. Run one before tagging.
 2. **`release` environment** (Settings → Environments): required reviewer = the maintainers, deployment
    restricted to tags matching `v*`. Without it, a tag would publish without asking.
 3. **Tag ruleset** (Settings → Rules): only maintainers can create, update or delete `v*` tags.
+   The `Protect main` and `Require CI on main` rulesets keep a broken or rewritten `main` from being tagged.
 4. **First release only, the bootstrap token.** npm can only trust a workflow for a package that exists,
    so the first publish uses a token:
    - npmjs.com → Access Tokens → Generate New Token → *Granular*: expiration **1 day**, packages and

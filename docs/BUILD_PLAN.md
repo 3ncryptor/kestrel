@@ -573,7 +573,10 @@ Releases run from `.github/workflows/release.yml` ([RELEASING.md](../RELEASING.m
 live, as an environment secret), a `Release tags` ruleset, and npm trusted publishing after the first
 release, so no long-lived npm token exists. v0.1.0 was released on 2026-09-29.
 
-Still to set up on GitHub: branch protection for `main` and private vulnerability reporting (SECURITY.md).
+Repository settings: `Protect main` (no force-push or deletion, no bypass) and `Require CI on main`
+(changes through a pull request with a green `CI result`; maintainers may push directly), private
+vulnerability reporting (the channel SECURITY.md names), Dependabot alerts and security updates, and
+secret scanning with push protection.
 
 ## 15. Logic ported from the prototype
 
