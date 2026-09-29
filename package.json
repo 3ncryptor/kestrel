@@ -22,7 +22,9 @@
     "test:bun": "bun test --timeout 20000 tests/unit tests/integration",
     "test:ui": "bun test tests/ui",
     "test:coverage": "node --test --test-timeout=20000 --experimental-test-coverage tests/unit tests/integration",
-    "typecheck": "tsc -p tsconfig.core.json"
+    "typecheck": "tsc -p tsconfig.core.json",
+    "build": "bun scripts/build.js",
+    "build:archive": "bun scripts/build.js --archive"
   },
   "dependencies": {
     "@opentui/core": "0.5.12",
