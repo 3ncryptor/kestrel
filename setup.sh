@@ -20,7 +20,7 @@ for arg in "$@"; do
     case "$arg" in
         -y | --yes) YES=1 ;;
         --check) CHECK=1 ;;
-        -h | --help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h | --help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;;
         *) printf 'setup: unknown option %s (try --help)\n' "$arg" >&2; exit 2 ;;
     esac
 done
