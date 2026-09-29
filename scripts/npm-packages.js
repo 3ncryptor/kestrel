@@ -22,6 +22,42 @@ const common = () => ({
     bugs: root.bugs,
 });
 
+const NPM_DIR = path.join(ROOT, 'packaging', 'npm');
+const PLATFORMS = Object.freeze({
+    'darwin-arm64': 'macOS on Apple Silicon (arm64)',
+    'darwin-x64': 'macOS on Intel (x64)',
+    'linux-x64': 'Linux on x64',
+    'linux-arm64': 'Linux on arm64',
+});
+const REQUIREMENTS = Object.freeze({
+    darwin: 'macOS 13 (Ventura) or newer.',
+    linux: 'A glibc-based distribution (Debian, Ubuntu, Fedora, Amazon Linux and most others). musl-based ones such as Alpine are not supported.',
+});
+
+/** packaging/npm/platform-README.md filled in for one target; fails on a placeholder left unfilled. */
+function platformReadme(target, binary) {
+    const packages = [
+        '| Package | Platform |',
+        '|---|---|',
+        ...TARGETS.map((t) => {
+            const name = `kestrel-tui-${t}`;
+            return t === target ? `| **${name}** (this package) | **${PLATFORMS[t]}** |` : `| [${name}](https://www.npmjs.com/package/${name}) | ${PLATFORMS[t]} |`;
+        }),
+    ].join('\n');
+    const values = {
+        name: `kestrel-tui-${target}`,
+        platform: PLATFORMS[target],
+        requirements: REQUIREMENTS[target.split('-')[0]],
+        size: `${Math.max(1, Math.round(fs.statSync(binary).size / 1048576))} MB`,
+        packages,
+    };
+    const text = fs.readFileSync(path.join(NPM_DIR, 'platform-README.md'), 'utf-8')
+        .replace(/\{\{(\w+)\}\}/g, (match, key) => values[key] ?? match);
+    const left = text.match(/\{\{\w+\}\}/);
+    if (left) throw new Error(`platform-README.md: no value for ${left[0]}`);
+    return text;
+}
+
 function writePackage(dir, manifest, files) {
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'package.json'), `${JSON.stringify(manifest, null, 2)}\n`);
@@ -46,8 +82,10 @@ function generate({ binaries, out }) {
             ...common(),
             os: [os],
             cpu: [cpu],
-            files: ['bin/kestrel', 'LICENSE'],
+            files: ['bin/kestrel', 'README.md', 'LICENSE'],
         }, [[path.join(binaries, `kestrel-${target}`), 'bin/kestrel', 0o755]]);
+        const binary = path.join(binaries, `kestrel-${target}`);
+        fs.writeFileSync(path.join(out, `kestrel-tui-${target}`, 'README.md'), platformReadme(target, binary));
     }
     writePackage(path.join(out, 'kestrel-tui'), {
         name: 'kestrel-tui',
@@ -60,8 +98,9 @@ function generate({ binaries, out }) {
         os: root.os,
         optionalDependencies: Object.fromEntries(TARGETS.map((t) => [`kestrel-tui-${t}`, root.version])),
     }, [
-        [path.join(ROOT, 'packaging', 'npm', 'launcher.js'), 'bin/kestrel.js', 0o755],
-        [path.join(ROOT, 'README.md'), 'README.md'],
+        [path.join(NPM_DIR, 'launcher.js'), 'bin/kestrel.js', 0o755],
+        // The npm README, written for people installing the package (the repository README is for contributors).
+        [path.join(NPM_DIR, 'README.md'), 'README.md'],
     ]);
     return TARGETS.map((t) => `kestrel-tui-${t}`).concat('kestrel-tui');
 }

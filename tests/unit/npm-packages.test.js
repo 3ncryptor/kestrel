@@ -37,6 +37,31 @@ test('generate writes the launcher package and one package per platform', (t) =>
     for (const dir of fs.readdirSync(out)) assert.ok(fs.existsSync(path.join(out, dir, 'LICENSE')), `${dir} ships the license`);
 });
 
+test('every package ships a README written for npm: kestrel-tui its own, each platform one of its own', (t) => {
+    const { bins, out } = withBinaries(t);
+    generate({ binaries: bins, out });
+    for (const dir of fs.readdirSync(out)) {
+        const manifest = JSON.parse(fs.readFileSync(path.join(out, dir, 'package.json'), 'utf-8'));
+        assert.ok(manifest.files.includes('README.md'), `${dir} publishes its README`);
+        const readme = fs.readFileSync(path.join(out, dir, 'README.md'), 'utf-8');
+        assert.ok(readme.startsWith(`# ${dir}\n`), `${dir}'s README is titled with the package name`);
+        // npmjs.com cannot resolve links relative to the repository: every link must be absolute or an anchor.
+        const relative = [...readme.matchAll(/\]\(([^)]+)\)/g)].map((m) => m[1]).filter((href) => !/^(https:\/\/|#)/.test(href));
+        assert.deepEqual(relative, [], `${dir}'s README has only absolute links`);
+        assert.doesNotMatch(readme, /\{\{\w+\}\}/, `${dir}'s README has no unfilled placeholder`);
+    }
+    const npmDir = path.join(__dirname, '..', '..', 'packaging', 'npm');
+    assert.equal(fs.readFileSync(path.join(out, 'kestrel-tui', 'README.md'), 'utf-8'), fs.readFileSync(path.join(npmDir, 'README.md'), 'utf-8'));
+
+    const platform = fs.readFileSync(path.join(out, 'kestrel-tui-linux-arm64', 'README.md'), 'utf-8');
+    assert.match(platform, /The `kestrel` binary for Linux on arm64/);
+    assert.match(platform, /npm install -g kestrel-tui/);
+    assert.match(platform, /\*\*kestrel-tui-linux-arm64\*\* \(this package\)/);
+    assert.match(platform, /\[kestrel-tui-darwin-arm64\]\(https:\/\/www\.npmjs\.com\/package\/kestrel-tui-darwin-arm64\)/);
+    assert.match(platform, /glibc/);
+    assert.match(fs.readFileSync(path.join(out, 'kestrel-tui-darwin-x64', 'README.md'), 'utf-8'), /macOS 13 \(Ventura\) or newer/);
+});
+
 test('generate refuses to publish a partial set of platforms', (t) => {
     const { bins, out } = withBinaries(t, ['linux-x64']);
     assert.throws(() => generate({ binaries: bins, out }), /missing kestrel-darwin-arm64/);
