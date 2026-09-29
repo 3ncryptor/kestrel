@@ -5,6 +5,7 @@ import { ScrollMeter } from '@/components/motion/ScrollMeter';
 import { SmoothScroll } from '@/components/motion/SmoothScroll';
 import { Footer } from '@/components/site/Footer';
 import { Nav } from '@/components/site/Nav';
+import { QuitEgg } from '@/components/site/QuitEgg';
 import { SiteShortcuts } from '@/components/site/SiteShortcuts';
 import { Toaster } from '@/components/ui/sonner';
 import { SITE } from '@/lib/site';
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <Footer />
                 <Toaster theme="dark" position="bottom-center" />
                 <SiteShortcuts />
+                <QuitEgg />
                 <SmoothScroll />
                 <ScrollMeter />
             </body>

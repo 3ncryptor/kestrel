@@ -33,6 +33,8 @@ const VIEWS = [
     { name: 'compact', width: 64, height: 26, depth: 'truecolor', ticks: 1 },
     { name: 'wide', width: 150, height: 34, depth: 'truecolor', ticks: 1 },
     { name: 'mono', width: 100, height: 30, depth: 'none', ticks: 1 },
+    // Kestrel's own quit dialog, as `q` opens it with the stack running (the site's q easter egg).
+    { name: 'quit', width: 100, height: 30, depth: 'truecolor', ticks: 1, press: 'q' },
 ];
 
 const settle = () => new Promise((resolve) => setImmediate(resolve));
@@ -94,6 +96,10 @@ async function render(view) {
     await effects();
     await ui.mockInput.typeText('v');
     await effects();
+    if (view.press) {
+        await ui.mockInput.typeText(view.press);
+        await effects();
+    }
 
     const captured = [];
     for (let t = first; t < first + view.ticks; t++) {
