@@ -114,9 +114,9 @@ run `kestrel pm` inside `tmux`.
 
 ## Platforms
 
-| | macOS 13+ | Linux (glibc) |
+| | macOS 13+ (Bun's minimum) | Linux (glibc) |
 |---|---|---|
-| arm64 | ✓ Apple Silicon | ✓ Graviton, Raspberry Pi 4/5 |
+| arm64 | ✓ Apple Silicon | ✓ AWS Graviton, Raspberry Pi (64-bit OS) |
 | x64 | ✓ Intel | ✓ |
 | Sampling | libproc through Bun's FFI; other users' processes every 5 s (macOS limits this to root) | `/proc` |
 
