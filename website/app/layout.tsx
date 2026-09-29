@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { Footer } from '@/components/site/Footer';
 import { Nav } from '@/components/site/Nav';
+import { Toaster } from '@/components/ui/sonner';
 import { SITE } from '@/lib/site';
 import './globals.css';
 
@@ -21,7 +22,7 @@ export const viewport: Viewport = { themeColor: '#000000', colorScheme: 'dark' }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
     return (
-        <html lang="en">
+        <html lang="en" className="dark">
             <body className="min-h-dvh font-sans">
                 <a
                     href="#main"
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <Nav />
                 <main id="main">{children}</main>
                 <Footer />
+                <Toaster theme="dark" position="bottom-center" />
             </body>
         </html>
     );
