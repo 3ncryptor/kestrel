@@ -1,10 +1,13 @@
 # Static analysis of the JavaScript/TypeScript sources with CodeQL's security-and-quality queries.
+# Documentation-only changes are skipped; the weekly run analyses everything regardless.
 name: CodeQL
 
 on:
   push:
     branches: [main]
+    paths-ignore: ["**/*.md", "docs/**", "LICENSE", ".github/ISSUE_TEMPLATE/**", ".github/CODEOWNERS", ".github/dependabot.yml"]
   pull_request:
+    paths-ignore: ["**/*.md", "docs/**", "LICENSE", ".github/ISSUE_TEMPLATE/**", ".github/CODEOWNERS", ".github/dependabot.yml"]
   schedule:
     - cron: "27 4 * * 1"
 
