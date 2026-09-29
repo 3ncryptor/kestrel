@@ -9,6 +9,7 @@ const { dashboard } = require('./commands/interactive');
 const { pm } = require('./commands/pm');
 const { init } = require('./commands/init');
 const { importCommand } = require('./commands/import');
+const { update } = require('./commands/update');
 
 const HANDLERS = {
     help,
@@ -19,7 +20,7 @@ const HANDLERS = {
     init,
     import: importCommand,
     doctor: pending('doctor'),
-    update: pending('update'),
+    update,
 };
 
 const defaultIo = () => ({ stdout: process.stdout, stderr: process.stderr, stdin: process.stdin, cwd: process.cwd(), env: process.env });

@@ -16,6 +16,7 @@ const OPTIONS = {
     interval: { type: 'string' },
     force: { type: 'boolean' },
     yes: { type: 'boolean', short: 'y' },
+    check: { type: 'boolean' },
     help: { type: 'boolean', short: 'h' },
     version: { type: 'boolean', short: 'v' },
 };
@@ -52,6 +53,7 @@ function checkCombinations(command, values, positionals) {
     const writesConfig = command === 'init' || command === 'import';
     if (values.force && !writesConfig) throw new UsageError('--force only works with "init" and "import"');
     if (values.yes && !writesConfig) throw new UsageError('--yes only works with "init" and "import"');
+    if (values.check && command !== 'update') throw new UsageError('--check only works with "update"');
     if (command === 'import' && positionals[0] !== 'pm2') throw new UsageError('Usage: kestrel import pm2 [ecosystem-file]');
     const allowed = command === 'import' ? 2 : 0;
     if (positionals.length > allowed) throw new UsageError(`Unexpected argument "${positionals[allowed]}"`);
@@ -60,7 +62,7 @@ function checkCombinations(command, values, positionals) {
 /**
  * @param {string[]} argv  process.argv.slice(2)
  * @returns {{ command: string, options: { config: string|null, only: string[], noColor: boolean,
- *             dump: boolean, ticks: number, intervalMs: number|null, force: boolean, yes: boolean }, positionals: string[] }}
+ *             dump: boolean, ticks: number, intervalMs: number|null, force: boolean, yes: boolean, check: boolean }, positionals: string[] }}
  */
 function parseCli(argv) {
     const { values, positionals } = /** @type {{ values: Record<string, any>, positionals: string[] }} */ (readRaw(argv));
@@ -82,10 +84,11 @@ function parseCli(argv) {
             intervalMs: values.interval === undefined ? null : intInRange(values.interval, INTERVAL_RANGE, '--interval'),
             force: Boolean(values.force),
             yes: Boolean(values.yes),
+            check: Boolean(values.check),
         },
     };
 }
 
-const defaults = () => ({ config: null, only: [], noColor: false, dump: false, ticks: 1, intervalMs: null, force: false, yes: false });
+const defaults = () => ({ config: null, only: [], noColor: false, dump: false, ticks: 1, intervalMs: null, force: false, yes: false, check: false });
 
 module.exports = { parseCli, UsageError, COMMANDS, ALIASES };

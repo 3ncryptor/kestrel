@@ -7,7 +7,7 @@ Usage
   kestrel init                Create kestrel.json from a Procfile or package.json scripts
   kestrel import pm2 [file]   Convert a pm2 setup into kestrel.json
   kestrel doctor              Check this system, the terminal and the config
-  kestrel update              Update to the latest release
+  kestrel update [--check]    Update a standalone install to the latest release
 
 Options
   --config <path>     Use this kestrel.json instead of searching for one

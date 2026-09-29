@@ -27,7 +27,7 @@ test('pm/sm subcommands and their -pm/--pm/-sm/--sm aliases', () => {
 
 test('options are parsed and converted', () => {
     const parsed = parseCli(['sm', '--dump', '--ticks', '3', '--interval', '500', '--no-color']);
-    assert.deepEqual(parsed.options, { config: null, only: [], noColor: true, dump: true, ticks: 3, intervalMs: 500, force: false, yes: false });
+    assert.deepEqual(parsed.options, { config: null, only: [], noColor: true, dump: true, ticks: 3, intervalMs: 500, force: false, yes: false, check: false });
     assert.deepEqual([parseCli(['init', '--force', '-y']).options.force, parseCli(['init', '--force', '-y']).options.yes], [true, true]);
     assert.deepEqual(parseCli(['pm', '--only', 'api, web', '--config', 'ops/k.json']).options.only, ['api', 'web']);
     assert.deepEqual(parseCli(['import', 'pm2', 'eco.json']).positionals, ['pm2', 'eco.json']);
@@ -52,6 +52,7 @@ test('usage errors are specific and exit with code 2', () => {
     usage(['import'], /import pm2/);
     usage(['pm', '--force'], /--force only works with "init" and "import"/);
     usage(['sm', '-y'], /--yes only works/);
+    usage(['pm', '--check'], /--check only works with "update"/);
     usage(['sm', 'extra'], /Unexpected argument "extra"/);
     usage(['--config'], /argument missing|requires/i);
 });
@@ -75,7 +76,7 @@ test('main reports usage errors on stderr with exit code 2', async () => {
 });
 
 test('commands that arrive in later milestones say so and exit 1', async () => {
-    const cases = [[['doctor'], /M4/], [['update'], /M4/]];
+    const cases = [[['doctor'], /M4/]];
     for (const [argv, pattern] of cases) {
         const f = fakeIo();
         assert.equal(await main(argv, f.io), 1, argv.join(' '));

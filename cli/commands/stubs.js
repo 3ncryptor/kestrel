@@ -2,7 +2,6 @@
 
 const PENDING = {
     doctor: ['M4', 'kestrel doctor'],
-    update: ['M4', 'kestrel update'],
 };
 
 /** Returns a command handler that reports when `name` becomes available. */
