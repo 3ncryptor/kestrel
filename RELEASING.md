@@ -62,14 +62,18 @@ Then:
 - on npmjs.com, for each of the five packages: Settings → Publishing access → *Require two-factor
   authentication and disallow tokens*.
 
-The next release publishes through OIDC with no change to the workflow.
+The next release publishes through OIDC with no change to the workflow: with the secret gone,
+`NODE_AUTH_TOKEN` is empty and npm falls through to trusted publishing. That release is the first real
+test of it, so watch its publish job; if npm answers 401/403 there, check `npx npm@11.20.0 trust list
+kestrel-tui` (workflow file, repository and environment must match exactly), fix it, and re-run the job.
 
 ## When something fails
 
 - **Before publish:** fix it on `main`, delete the tag (`git push origin :refs/tags/v0.1.0`,
   `git tag -d v0.1.0`), and tag again.
 - **During publish:** re-run the failed jobs. Every step can run again: the draft release gets its files
-  replaced, and npm versions that are already published are skipped.
+  replaced, and npm versions that are already published are skipped. If you give the version up
+  instead, delete its draft release (`gh release delete v0.1.0`) so it doesn't linger.
 - **After publish:** an npm version can never be reused, even after unpublishing. Fix forward with a
   patch release (`0.1.1`). Don't unpublish unless a release is harmful; npm only allows it within 72 hours.
 
