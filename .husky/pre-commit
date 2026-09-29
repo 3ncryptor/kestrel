@@ -1,0 +1,3 @@
+# Fast checks before every commit (the test suites run in CI). Skip once with: git commit --no-verify
+bun run --silent lint
+bun run --silent typecheck

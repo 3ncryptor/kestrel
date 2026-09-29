@@ -9,7 +9,7 @@
 | Docker | any | Linux testing on a Mac (optional, but required before a milestone review) |
 
 ```sh
-./setup.sh          # checks the tools, installs Bun and the dependencies, git hooks, a `kestrel` command
+./setup.sh          # checks the tools, installs Bun and the dependencies (plus the husky pre-commit hook), a `kestrel` command
 ```
 
 On Windows use WSL2 for everything below (see CONTRIBUTING.md); Git Bash covers lint and types.

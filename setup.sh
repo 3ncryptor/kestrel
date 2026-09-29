@@ -1,7 +1,7 @@
 #!/bin/sh
 # Sets up a Kestrel development environment in one step: checks the tools, installs what is missing
-# (with your permission), installs dependencies, adds the git hooks and a `kestrel` dev command, and
-# verifies that everything works.
+# (with your permission), installs dependencies (which also installs the husky git hook), links a
+# `kestrel` dev command, and verifies that everything works.
 #
 #   ./setup.sh            interactive: asks before installing or changing anything outside the repo
 #   ./setup.sh --yes      accepts every default (CI, scripts)
@@ -158,13 +158,11 @@ bun install --frozen-lockfile
 ok "installed from bun.lock"
 
 step "Git hooks"
-if [ "$(git config --get core.hooksPath || true)" = ".githooks" ]; then
-    ok "pre-commit hook active (lint + type check)"
-elif ask "Run lint and the type check before every commit (a git hook in .githooks/)?"; then
-    git config core.hooksPath .githooks
-    ok "pre-commit hook active (skip once with git commit --no-verify)"
+# husky installs the hook during `bun install` (the package's prepare script).
+if [ "$(git config --get core.hooksPath || true)" = ".husky/_" ]; then
+    ok "husky pre-commit hook: lint + type check (skip once with git commit --no-verify)"
 else
-    note "skipped; enable later with: git config core.hooksPath .githooks"
+    warn "the husky hook is not active: run bun install inside the git checkout"
 fi
 
 if [ "$PLATFORM" != gitbash ]; then

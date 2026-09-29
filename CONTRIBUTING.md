@@ -26,7 +26,7 @@ git clone https://github.com/3ncryptor/kestrel.git && cd kestrel
 ```
 
 `setup.sh` checks the tools above and installs Bun if needed (it asks first). It then installs the
-dependencies, enables a pre-commit hook (lint + type check) and links a `kestrel` command to your
+dependencies (which installs a husky pre-commit hook: lint + type check) and links a `kestrel` command to your
 checkout, and it finishes by running lint, the type check and the test suites. `--check` only reports,
 and `--yes` accepts every default.
 

@@ -34,7 +34,7 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - name: shellcheck
-        run: shellcheck -s sh setup.sh .githooks/pre-commit packaging/install.sh scripts/*.sh scripts/e2e/*.sh
+        run: shellcheck -s sh setup.sh .husky/pre-commit packaging/install.sh scripts/*.sh scripts/e2e/*.sh
 
   test:
     name: Tests (${{ matrix.os }})

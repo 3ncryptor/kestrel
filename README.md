@@ -70,7 +70,7 @@ git clone https://github.com/3ncryptor/kestrel.git && cd kestrel
 npm run demo               # the process manager on a demo stack
 ```
 
-`setup.sh` checks and installs what's needed (Bun, the dependencies, a git hook, a `kestrel` command
+`setup.sh` checks and installs what's needed (Bun, the dependencies, a husky pre-commit hook, a `kestrel` command
 linked to your checkout) and verifies everything. `./setup.sh --check` only reports. On Windows, the
 full setup runs inside WSL2; Git Bash covers editing, lint and the type check.
 

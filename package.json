@@ -44,7 +44,8 @@
     "build": "bun scripts/build.js",
     "build:archive": "bun scripts/build.js --archive",
     "lint": "biome lint",
-    "setup": "sh ./setup.sh"
+    "setup": "sh ./setup.sh",
+    "prepare": "husky"
   },
   "dependencies": {
     "@opentui/core": "0.5.12",
@@ -54,6 +55,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
     "@types/node": "20.19.43",
+    "husky": "9.1.7",
     "typescript": "6.0.3"
   },
   "engines": {

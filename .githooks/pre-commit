@@ -1,6 +1,0 @@
-#!/bin/sh
-# Runs before every commit once ./setup.sh enabled it (git config core.hooksPath .githooks).
-# Fast checks only; the test suites run in CI. Skip once with: git commit --no-verify
-set -e
-bun run --silent lint
-bun run --silent typecheck
