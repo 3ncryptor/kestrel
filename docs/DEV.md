@@ -9,8 +9,10 @@
 | Docker | any | Linux testing on a Mac (optional, but required before a milestone review) |
 
 ```sh
-bun install
+./setup.sh          # checks the tools, installs Bun and the dependencies, git hooks, a `kestrel` command
 ```
+
+On Windows use WSL2 for everything below (see CONTRIBUTING.md); Git Bash covers lint and types.
 
 ## Everyday commands
 
@@ -21,8 +23,10 @@ bun install
 | `npm run test:coverage` | Node's coverage report (target ≥ 80% for `core/` and `cli/`) |
 | `npm run typecheck` | `tsc` over the JSDoc types in `core/` and `cli/` (strict) |
 | `npm start` | The btop-style dashboard, React production build (a stack here is shown idle) |
-| `npm start -- pm --config tests/fixtures/stack/kestrel.json` | The demo stack: db (port), api (http, needs db), worker (log line), flaky (crash loop) |
-| `npm start -- sm` | The same dashboard without the managed box |
+| `npm run demo` | The process manager on the demo stack: db (port), api (http, needs db), worker (log line), flaky (crash loop) |
+| `npm run pm` / `npm run sm` / `npm run doctor` | The process manager for this folder / the monitor only / the environment check |
+| `npm run pm -- --only api` | Flags go after `--`: npm keeps the ones before it (`npm start --pm` opens the plain dashboard) |
+| `kestrel …` | After `./setup.sh` (bun link): the real command, running this checkout in production mode |
 | `npm run dev` | Same UI with React's development build (clearer errors, ~2× the CPU) |
 | `npm run test:ui` | UI frame tests (Bun + OpenTUI test renderer) |
 | `bun cli/index.js sm --dump --ticks 3` | Headless: prints 3 JSON snapshots of the live system |

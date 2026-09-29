@@ -22,9 +22,25 @@ This guide covers what you need to work on it and what a change needs before it 
 
 ```sh
 git clone https://github.com/3ncryptor/kestrel.git && cd kestrel
-bun install
-npm start            # the dashboard (production React)
-npm start -- pm --config tests/fixtures/stack/kestrel.json   # the demo stack
+./setup.sh           # macOS, Linux, Windows WSL2   ·   Windows PowerShell: .\setup.ps1
+```
+
+`setup.sh` checks the tools above and installs Bun if needed (it asks first). It then installs the
+dependencies, enables a pre-commit hook (lint + type check) and links a `kestrel` command to your
+checkout, and it finishes by running lint, the type check and the test suites. `--check` only reports,
+and `--yes` accepts every default.
+
+**Windows:** Kestrel monitors and manages macOS and Linux processes, and its process tests use POSIX
+process groups. So the full setup (running Kestrel and every test suite) happens in **WSL2**: run
+`wsl --install`, clone the repository inside WSL, then `./setup.sh`. On a plain Windows checkout,
+`setup.ps1` (or `setup.sh` in Git Bash) prepares the dependencies, hooks, lint and type check, which is
+enough for docs and most UI and config work. CI runs the setup on Linux, macOS and Windows.
+
+Then:
+
+```sh
+npm run demo         # the process manager on the demo stack
+npm start            # the dashboard
 ```
 
 [docs/DEV.md](docs/DEV.md) lists every command, the Linux-on-a-Mac loop and how performance is measured.
