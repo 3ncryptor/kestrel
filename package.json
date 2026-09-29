@@ -3,6 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "description": "A portable ops cockpit for the terminal: system monitor and process manager in one binary",
+  "keywords": [
+    "terminal",
+    "tui",
+    "system-monitor",
+    "process-manager",
+    "htop",
+    "btop",
+    "pm2",
+    "procfile",
+    "devtools",
+    "macos",
+    "linux"
+  ],
+  "author": "Aryan Vibhuti",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -42,5 +56,6 @@
   "os": [
     "darwin",
     "linux"
-  ]
+  ],
+  "packageManager": "bun@1.4.0"
 }

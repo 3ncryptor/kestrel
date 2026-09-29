@@ -1,0 +1,8 @@
+# Normalise line endings: shell scripts must stay LF to run on macOS and Linux.
+* text=auto eol=lf
+*.sh text eol=lf
+*.py text eol=lf
+
+# Generated files: collapsed in diffs and left out of GitHub's language statistics.
+bun.lock linguist-generated=true
+tests/fixtures/** linguist-vendored=true
