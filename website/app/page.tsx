@@ -1,10 +1,7 @@
-import { ClosingCta } from '@/components/site/ClosingCta';
 import { Faq } from '@/components/site/Faq';
 import { Features } from '@/components/site/Features';
 import { Hero } from '@/components/site/Hero';
 import { HowItWorks } from '@/components/site/HowItWorks';
-import { MergeCards } from '@/components/site/MergeCards';
-import { Numbers } from '@/components/site/Numbers';
 import { Platforms } from '@/components/site/Platforms';
 import { Section } from '@/components/site/Section';
 import { StackExplorer } from '@/components/site/StackExplorer';
@@ -19,14 +16,8 @@ export default async function Home() {
             <Hero />
             <StatStrip />
             <HowItWorks initial={initial} crashStill={crashStill} />
-            <Section id="why" eyebrow="Why one app" title="Two tools, each seeing half the picture" lead="A system monitor sees every process but not which are yours. A process manager runs yours but can’t see the machine. Kestrel does both, so it can connect them.">
-                <MergeCards />
-            </Section>
             <Section id="features" eyebrow="Features" title="Built for the terminal you already live in">
                 <Features />
-                <div className="mt-6">
-                    <Numbers />
-                </div>
             </Section>
             <Section id="stack" eyebrow="kestrel.json" title="Describe your stack once" lead="Hover a key to see what it does. A Procfile or your package.json scripts work too, without any config.">
                 <StackExplorer />
@@ -34,13 +25,12 @@ export default async function Home() {
             <Section id="trust" eyebrow="Trust" title="Verifiable from npm to your machine">
                 <Trust />
             </Section>
-            <Section id="platforms" eyebrow="Platforms" title="macOS and Linux, arm64 and x64">
+            <Section id="platforms" eyebrow="Packages" title="macOS and Linux, arm64 and x64">
                 <Platforms />
             </Section>
             <Section id="faq" eyebrow="FAQ" title="Questions people ask">
                 <Faq />
             </Section>
-            <ClosingCta />
         </>
     );
 }
