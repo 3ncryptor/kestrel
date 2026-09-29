@@ -497,12 +497,12 @@ included).
 
 ## 12. Milestones
 
-Every milestone produces something usable and ends with a review by you. The order follows the dependency
+Every milestone produces something usable and ends with a review. The order follows the dependency
 chain: contracts first, then the Monitor (the primary job), then the Manager, then shipping.
 
 ### M0 — Clean slate (done 2026-09-28)
 - The prototype was removed and Kestrel rebuilt from scratch to the §5 layout, as a standalone package (`kestrel-tui`, MIT). Proven logic was *ported* with new tests (§15).
-- **No commits in the coursework repo.** The first commit happens in the new repository (§14).
+- The history starts in this repository (§14).
 
 ### M1 — Foundation (week 1)
 1. `core/platform`: interface, `darwin.js` (moving the existing parsers over), `linux.js`, and fixtures for both.
@@ -520,7 +520,7 @@ chain: contracts first, then the Monitor (the primary job), then the Manager, th
 3. Overview screen with cards and drill-in.
 4. Monitor: table, tree, per-core grid, sparklines, thresholds, filter, sort, detail drawer.
 5. Ports view, kill-by-port, and tiered safety dialogs.
-- **Exit:** you use `kestrel sm` in place of htop for one day. UI tests cover every state in UI_SPEC §7.
+- **Exit:** `kestrel sm` replaces htop for a full day of daily use. UI tests cover every state in UI_SPEC §7.
 
 ### M3 — Manager complete (week 3) — built 2026-09-29
 1. Supervisor v2: state machine, restart policies, env merging, saved logs, run state.
@@ -545,7 +545,7 @@ chain: contracts first, then the Monitor (the primary job), then the Manager, th
 4. `packaging/install.sh`, the npm launcher, and the Homebrew formula template. `kestrel update` and `doctor`.
 5. Native process sampling on macOS via FFI to meet the CPU budget (§11.1). The release build compiles with `--define process.env.NODE_ENV='"production"'`.
 6. Performance benchmarks as a CI gate. README with the demo GIF, install matrix, and comparison table.
-- **Exit:** on a fresh EC2 instance, `curl … | sh` followed by `kestrel pm` works in under 60 s. The same holds for `brew install` on your Mac and `npx kestrel-tui`.
+- **Exit:** on a fresh EC2 instance, `curl … | sh` followed by `kestrel pm` works in under 60 s. The same holds for `brew install` on a Mac and `npx kestrel-tui`.
 
 ## 13. Distribution and release engineering
 
@@ -560,21 +560,16 @@ chain: contracts first, then the Monitor (the primary job), then the Manager, th
 | Installer | POSIX `sh` with `set -eu`. Detects `uname -s`/`-m`, downloads the tarball and checksums, checks with `shasum -a 256` or `sha256sum`, installs to `$KESTREL_INSTALL_DIR` or `~/.local/bin`, and prints a PATH hint. It never uses sudo |
 | macOS signing | Bun signs arm64 binaries ad hoc. Notarization is deferred to v1.1, since curl and brew installs don't trigger Gatekeeper |
 
-## 14. Repository migration
+## 14. Repository history
 
-Kestrel was built in `Sem05-AppDev/projects/kestrel/` alongside unrelated coursework and deliberately never
-committed there. **It moved on 2026-09-29 to <https://github.com/3ncryptor/kestrel>** (M4 step 1):
+Kestrel was developed privately before this repository existed (M0–M3). Its history was reconstructed
+here as **small, module-by-module commits in dependency order**: scaffold, docs, platform, sampler,
+store, system control, config, process manager, stack, composition and actions, CLI, UI logic, UI,
+end-to-end scripts. Every commit passes its own tests, so the history can be bisected. Later work
+lands as ordinary commits.
 
-- There was no git history to carry over, so the history was reconstructed as **small, module-by-module
-  commits** in dependency order: scaffold, docs, platform, sampler, store, system control, config, process
-  manager, stack, composition and actions, CLI, UI logic, UI, end-to-end scripts. This was your request.
-  Every commit passes its own tests, so the history can be bisected. From here on, work lands as ordinary
-  commits.
-- Still to do: enable branch protection, Actions and Dependabot. Add `NPM_TOKEN` and the tap-repo token as
-  **repository secrets**, never in files.
-- The coursework copy is frozen. Whether it stays as it is or becomes a link to the new repo is your call.
-- **Why before CI:** GitHub Actions only reads `.github/workflows/` at the repository root, so workflows
-  inside `projects/kestrel/.github/` would never have run.
+Still to set up on GitHub: branch protection for `main`, private vulnerability reporting (SECURITY.md),
+and, when releases start, the `NPM_TOKEN` and tap tokens as **repository secrets**, never in files.
 
 ## 15. Logic ported from the prototype
 
@@ -593,6 +588,6 @@ with new tests written against the v2 spec:
 
 | # | Question | Default if not decided |
 |---|---|---|
-| 1 | Is the Homebrew tap under your personal GitHub account or an org? | Personal: `3ncryptor/homebrew-tap` (the account that owns the repo) |
+| 1 | Where does the Homebrew tap live? | `3ncryptor/homebrew-tap`, next to this repository |
 
 Resolved: license is **MIT** (`LICENSE` added in M0). Git history: **none kept**, and the first commit happens in the new repo.
