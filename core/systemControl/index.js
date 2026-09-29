@@ -55,12 +55,12 @@ function isAlive(pid) {
 
 /** os.setPriority raises a SystemError whose real errno name is in `info.code`. */
 function translateReniceError(err, pid) {
-    const code = (err && err.info && err.info.code) || (err && err.code);
+    const code = err?.info?.code || err?.code;
     if (code === 'EACCES' || code === 'EPERM') {
         return new SystemControlError(`Permission denied: raising the priority of ${pid} needs sudo`, 'EPERM');
     }
     if (code === 'ESRCH') return new SystemControlError(`Process ${pid} no longer exists`, 'ESRCH');
-    return new SystemControlError(`Could not change priority: ${err && err.message}`, 'ERENICE');
+    return new SystemControlError(`Could not change priority: ${err?.message}`, 'ERENICE');
 }
 
 /**

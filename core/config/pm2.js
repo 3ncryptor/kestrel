@@ -71,7 +71,7 @@ function toConfig(apps, options) {
     const processes = {};
     const warnings = [];
     for (const app of apps) {
-        if (!app || !app.script) {
+        if (!app?.script) {
             warnings.push(`skipped an app without a "script"`);
             continue;
         }
@@ -84,7 +84,7 @@ function toConfig(apps, options) {
 
 /** @param {any} ecosystem  the exported object ({ apps: [...] }) or a bare array of apps */
 function fromEcosystem(ecosystem) {
-    const apps = Array.isArray(ecosystem) ? ecosystem : ecosystem && ecosystem.apps;
+    const apps = Array.isArray(ecosystem) ? ecosystem : ecosystem?.apps;
     if (!Array.isArray(apps)) throw new Error('The ecosystem file has no "apps" list');
     return toConfig(apps, { includeEnv: true });
 }

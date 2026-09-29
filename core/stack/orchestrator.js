@@ -93,7 +93,7 @@ function createOrchestrator({ pm, store, names: initialNames }) {
         if (!active) return;
         for (const name of names) {
             const entry = store.getManaged(name);
-            if (!entry || entry.status !== 'blocked' || !entry.blockedBy.includes(id)) continue;
+            if (entry?.status !== 'blocked' || !entry.blockedBy.includes(id)) continue;
             const stillFailing = depsOf(name).filter((d) => !OK.has(statusOf(d)));
             if (stillFailing.length) pm.block(name, stillFailing);
             else pm.start(name).catch(() => {});

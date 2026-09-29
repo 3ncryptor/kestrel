@@ -60,7 +60,7 @@ function move(d, delta) {
 function fold(d, id) {
     const state = d.getState();
     const row = state.processes.find((p) => p.pid === state.ui.selectedPid);
-    if (!row || !row.hasChildren) return;
+    if (!row?.hasChildren) return;
     if ((id === 'left' && !row.collapsed) || (id === 'right' && row.collapsed)) d.actions.toggleCollapse(row.pid);
 }
 

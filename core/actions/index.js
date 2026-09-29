@@ -9,7 +9,7 @@ const fail = (err) => ({
     ok: false,
     data: null,
     error: err instanceof Error ? err.message : String(err),
-    ...(err && err.code ? { code: err.code } : {}),
+    ...(err?.code ? { code: err.code } : {}),
 });
 
 function attempt(fn) {

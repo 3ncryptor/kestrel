@@ -77,14 +77,14 @@ export function Box({ title, accent, info = [], hints = [], status = null, focus
     const top = [{ text: ` ${title} `, role: accent, bold: true }];
     const bottomRight = status ? [{ text: status.message, role: TOAST_ROLE[status.level] || status.role || 'secondary' }] : [];
     // A toast (an action's result) always stays readable; hints give way to it.
-    const hintRoom = Math.max(0, width - BORDER_CHROME - (status && status.level ? Math.min(partsLength(bottomRight) + 2, width - BORDER_CHROME) : 0));
+    const hintRoom = Math.max(0, width - BORDER_CHROME - (status?.level ? Math.min(partsLength(bottomRight) + 2, width - BORDER_CHROME) : 0));
     return (
         <box flexDirection="column" width={width} height={height}>
             <BorderLine left={top} right={info} width={width} corners={['╭', '╮']} borderRole={borderRole} />
             <box border={['left', 'right']} borderColor={sideColor} height={Math.max(0, height - 2)} flexDirection="column" paddingLeft={1} paddingRight={1}>
                 {children}
             </box>
-            <BorderLine left={focused ? hintParts(hints, accent, hintRoom) : []} right={bottomRight} width={width} corners={['╰', '╯']} borderRole={borderRole} clip={Boolean(status && status.level)} />
+            <BorderLine left={focused ? hintParts(hints, accent, hintRoom) : []} right={bottomRight} width={width} corners={['╰', '╯']} borderRole={borderRole} clip={Boolean(status?.level)} />
         </box>
     );
 }

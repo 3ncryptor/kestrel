@@ -18,7 +18,7 @@ class PlatformError extends Error {
  */
 function toolError(err, tool) {
     if (err && err.code === 'ENOENT') return new PlatformError(`${tool} not found on this system`, 'ENOTOOL');
-    const detail = err && err.message ? err.message.split('\n')[0] : String(err);
+    const detail = err?.message ? err.message.split('\n')[0] : String(err);
     return new PlatformError(`${tool} failed: ${detail}`, 'EEXEC');
 }
 

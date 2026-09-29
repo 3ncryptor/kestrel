@@ -25,7 +25,7 @@ function signalPid(pid, signal) {
 }
 
 /** The folder a stack lives in (its config's folder), or null when there is no stack. */
-const stackDir = (stack) => (stack && stack.path ? path.dirname(stack.path) : null);
+const stackDir = (stack) => (stack?.path ? path.dirname(stack.path) : null);
 
 /**
  * @param {{ store: any, pm: any, stack: import('../config').StackResult, cwd: string,

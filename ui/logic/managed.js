@@ -27,7 +27,7 @@ export function statusLabel(m, now) {
         case 'starting':
             return `starting ${formatDuration((now - m.startedAt) / 1000)}`;
         case 'running':
-            if (m.ready && m.ready.ok) return `ready ${readyTarget(m.ready)}`.trim();
+            if (m.ready?.ok) return `ready ${readyTarget(m.ready)}`.trim();
             return `up ${formatDuration((now - m.startedAt) / 1000)}`;
         case 'unready':
             return `not ready ${m.ready ? readyTarget(m.ready) : ''}`.trim();

@@ -96,7 +96,7 @@ export function App({ store, actions, env, onQuit, coalesceMs = 0 }) {
                 height={bodyHeight}
                 bp={bp}
                 hints={hints}
-                drawerInfo={drawer && drawer.ok ? drawer.data : null}
+                drawerInfo={drawer?.ok ? drawer.data : null}
                 logView={logView}
             />
             <Overlay state={state} app={app} env={env} width={width} height={height} />
