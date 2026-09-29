@@ -27,6 +27,12 @@ export interface SpotlightSearchProps {
   showResults?: boolean;
   className?: string;
   disabled?: boolean;
+  /** Called with the chosen item (Enter or click), after onSubmit. */
+  onSelect?: (item: SpotlightItem) => void;
+  /** Rename the four filters (e.g. apps → "Commands"). */
+  filterLabels?: Partial<Record<SpotlightFilterId, string>>;
+  /** Focus the input when it mounts (for a search dialog). */
+  autoFocus?: boolean;
 }
 
 const DEFAULT_ITEMS: SpotlightItem[] = [
@@ -208,7 +214,11 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
   showResults = true,
   className,
   disabled = false,
+  onSelect,
+  filterLabels,
+  autoFocus = false,
 }) => {
+  const filterButtons = FILTER_BUTTONS.map((b) => ({ ...b, label: filterLabels?.[b.id] ?? b.label }));
   const generatedId = useId();
   const filterId = `spotlight-gooey-${generatedId.replace(/:/g, "")}`;
   const inputId = useId();
@@ -296,6 +306,7 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
       const selected = filteredItems[safeHighlightedIndex];
       if (selected) {
         onSubmit?.(selected.title, currentFilter);
+        onSelect?.(selected);
       } else {
         onSubmit?.(query, currentFilter);
       }
@@ -377,7 +388,7 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
             className="absolute left-0 top-0 h-12 rounded-full bg-zinc-200/90 dark:bg-[#1c1c1f]"
           />
 
-          {FILTER_BUTTONS.map((btn, idx) => (
+          {filterButtons.map((btn, idx) => (
             <motion.div
               key={`gooey-blob-${btn.id}`}
               initial={false}
@@ -420,6 +431,8 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
             <input
               id={inputId}
               ref={inputRef}
+              // biome-ignore lint/a11y/noAutofocus: only set by the search dialog, which the user just opened
+              autoFocus={autoFocus}
               type="text"
               value={query}
               onChange={handleInputChange}
@@ -450,7 +463,7 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
           )}
         </motion.div>
 
-        {FILTER_BUTTONS.map((btn, idx) => {
+        {filterButtons.map((btn, idx) => {
           const IconComponent = btn.icon;
           const isActive = currentFilter === btn.id;
           const isHoveredBtn = hoveredButtonId === btn.id;
@@ -544,7 +557,10 @@ export const SpotlightSearch: React.FC<SpotlightSearchProps> = ({
                         key={item.id}
                         type="button"
                         onMouseEnter={() => setHighlightedIndex(idx)}
-                        onClick={() => onSubmit?.(item.title, currentFilter)}
+                        onClick={() => {
+                          onSubmit?.(item.title, currentFilter);
+                          onSelect?.(item);
+                        }}
                         className={cn(
                           "relative flex items-center justify-between px-3 py-2 rounded-xl text-left transition-colors cursor-pointer w-full select-none",
                           isHighlighted
