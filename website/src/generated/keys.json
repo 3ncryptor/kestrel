@@ -1,0 +1,397 @@
+[
+  {
+    "context": "global",
+    "title": "Everywhere",
+    "entries": [
+      {
+        "keys": [
+          "?"
+        ],
+        "label": "? help"
+      },
+      {
+        "keys": [
+          "q",
+          "ctrl+c"
+        ],
+        "label": "q quit"
+      },
+      {
+        "keys": [
+          "escape"
+        ],
+        "label": "Esc back"
+      },
+      {
+        "keys": [
+          "tab"
+        ],
+        "label": "⇥ next box"
+      },
+      {
+        "keys": [
+          "L"
+        ],
+        "label": "L logs of the failed process"
+      }
+    ]
+  },
+  {
+    "context": "proc.table",
+    "title": "Processes",
+    "entries": [
+      {
+        "keys": [
+          "up",
+          "down",
+          "k",
+          "j"
+        ],
+        "label": "↑↓ select"
+      },
+      {
+        "keys": [
+          "/"
+        ],
+        "label": "/ filter"
+      },
+      {
+        "keys": [
+          "s"
+        ],
+        "label": "s sort"
+      },
+      {
+        "keys": [
+          "x"
+        ],
+        "label": "x kill"
+      },
+      {
+        "keys": [
+          "return"
+        ],
+        "label": "⏎ info"
+      },
+      {
+        "keys": [
+          "t"
+        ],
+        "label": "t tree view"
+      },
+      {
+        "keys": [
+          "S"
+        ],
+        "label": "S reverse sort"
+      },
+      {
+        "keys": [
+          "X"
+        ],
+        "label": "X force kill (SIGKILL)"
+      },
+      {
+        "keys": [
+          "r"
+        ],
+        "label": "r renice"
+      },
+      {
+        "keys": [
+          "pageup"
+        ],
+        "label": "PgUp page up"
+      },
+      {
+        "keys": [
+          "pagedown"
+        ],
+        "label": "PgDn page down"
+      },
+      {
+        "keys": [
+          "home"
+        ],
+        "label": "Home first row"
+      },
+      {
+        "keys": [
+          "end"
+        ],
+        "label": "End last row"
+      }
+    ]
+  },
+  {
+    "context": "proc.tree",
+    "title": "Processes (tree)",
+    "entries": [
+      {
+        "keys": [
+          "up",
+          "down",
+          "k",
+          "j"
+        ],
+        "label": "↑↓ select"
+      },
+      {
+        "keys": [
+          "left",
+          "right"
+        ],
+        "label": "←→ fold"
+      },
+      {
+        "keys": [
+          "/"
+        ],
+        "label": "/ filter"
+      },
+      {
+        "keys": [
+          "x"
+        ],
+        "label": "x kill"
+      },
+      {
+        "keys": [
+          "t"
+        ],
+        "label": "t flat view"
+      },
+      {
+        "keys": [
+          "s"
+        ],
+        "label": "s sort"
+      },
+      {
+        "keys": [
+          "return"
+        ],
+        "label": "⏎ info"
+      },
+      {
+        "keys": [
+          "S"
+        ],
+        "label": "S reverse sort"
+      },
+      {
+        "keys": [
+          "X"
+        ],
+        "label": "X force kill (SIGKILL)"
+      },
+      {
+        "keys": [
+          "r"
+        ],
+        "label": "r renice"
+      },
+      {
+        "keys": [
+          "pageup"
+        ],
+        "label": "PgUp page up"
+      },
+      {
+        "keys": [
+          "pagedown"
+        ],
+        "label": "PgDn page down"
+      },
+      {
+        "keys": [
+          "home"
+        ],
+        "label": "Home first row"
+      },
+      {
+        "keys": [
+          "end"
+        ],
+        "label": "End last row"
+      }
+    ]
+  },
+  {
+    "context": "ports",
+    "title": "Ports",
+    "entries": [
+      {
+        "keys": [
+          "x"
+        ],
+        "label": "x kill owner"
+      },
+      {
+        "keys": [
+          "return"
+        ],
+        "label": "⏎ jump"
+      },
+      {
+        "keys": [
+          "up",
+          "down",
+          "k",
+          "j"
+        ],
+        "label": "↑↓ select"
+      },
+      {
+        "keys": [
+          "/"
+        ],
+        "label": "/ filter"
+      },
+      {
+        "keys": [
+          "tab"
+        ],
+        "label": "⇥ next box"
+      }
+    ]
+  },
+  {
+    "context": "managed",
+    "title": "Managed processes and logs",
+    "entries": [
+      {
+        "keys": [
+          "s"
+        ],
+        "label": "s start"
+      },
+      {
+        "keys": [
+          "x"
+        ],
+        "label": "x stop"
+      },
+      {
+        "keys": [
+          "r"
+        ],
+        "label": "r restart"
+      },
+      {
+        "keys": [
+          "a"
+        ],
+        "label": "a start all"
+      },
+      {
+        "keys": [
+          "up",
+          "down",
+          "k",
+          "j"
+        ],
+        "label": "↑↓ select"
+      },
+      {
+        "keys": [
+          "X"
+        ],
+        "label": "X stop all"
+      },
+      {
+        "keys": [
+          "return"
+        ],
+        "label": "⏎ show in proc (or pick scripts)"
+      },
+      {
+        "keys": [
+          "n"
+        ],
+        "label": "n new process"
+      },
+      {
+        "keys": [
+          "e"
+        ],
+        "label": "e env"
+      },
+      {
+        "keys": [
+          "w"
+        ],
+        "label": "w save to kestrel.json"
+      },
+      {
+        "keys": [
+          "f"
+        ],
+        "label": "f follow"
+      },
+      {
+        "keys": [
+          "/"
+        ],
+        "label": "/ search"
+      },
+      {
+        "keys": [
+          "v"
+        ],
+        "label": "v all / one"
+      },
+      {
+        "keys": [
+          "pageup"
+        ],
+        "label": "PgUp older"
+      },
+      {
+        "keys": [
+          "pagedown"
+        ],
+        "label": "PgDn newer"
+      },
+      {
+        "keys": [
+          "g",
+          "home"
+        ],
+        "label": "g oldest"
+      },
+      {
+        "keys": [
+          "G",
+          "end"
+        ],
+        "label": "G newest"
+      }
+    ]
+  },
+  {
+    "context": "drawer",
+    "title": "Details",
+    "entries": [
+      {
+        "keys": [
+          "x"
+        ],
+        "label": "x kill"
+      },
+      {
+        "keys": [
+          "r"
+        ],
+        "label": "r renice"
+      },
+      {
+        "keys": [
+          "escape",
+          "return"
+        ],
+        "label": "Esc close"
+      }
+    ]
+  }
+]
