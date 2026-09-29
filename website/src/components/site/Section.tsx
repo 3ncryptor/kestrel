@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { LineReveal, Scramble } from '@/components/motion/Reveal';
 import { HorizontalScale } from '@/components/ui/scales';
 import { cn } from '@/lib/cn';
 
@@ -24,9 +25,9 @@ export function Section({
                 <HorizontalScale className="mb-14 opacity-60" />
                 <p className="font-mono text-k-teal text-xs uppercase tracking-[0.2em]">{eyebrow}</p>
                 <h2 id={`${id}-title`} className="mt-4 max-w-3xl text-balance font-semibold text-3xl text-k-text tracking-tight sm:text-4xl">
-                    {title}
+                    {typeof title === 'string' ? <Scramble text={title} /> : title}
                 </h2>
-                {lead && <p className="mt-5 max-w-2xl text-balance text-lg leading-relaxed">{lead}</p>}
+                {lead && <LineReveal className="mt-5 max-w-2xl text-balance text-lg leading-relaxed">{lead}</LineReveal>}
                 <div className="mt-14">{children}</div>
             </div>
         </section>

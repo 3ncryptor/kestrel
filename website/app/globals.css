@@ -95,6 +95,21 @@
     }
 }
 
+/* Lenis (lenis/dist/lenis.css, inlined): it scrolls the page itself, so CSS smooth scrolling must be off. */
+html.lenis,
+html.lenis body {
+    height: auto;
+}
+html.lenis {
+    scroll-behavior: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+    overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+    overscroll-behavior: contain;
+}
+
 @media (prefers-reduced-motion: reduce) {
     html {
         scroll-behavior: auto;
@@ -109,6 +124,17 @@
         transition-duration: 0.01ms !important;
     }
     /* biome-ignore-end lint/complexity/noImportantStyles: end of the reduced-motion override */
+}
+
+/* The grain layer's flicker: whole-tile-fraction jumps, stepped, so it reads as film grain, not drift. */
+@keyframes grain {
+    0% { transform: translate(0, 0); }
+    17% { transform: translate(-38px, 22px); }
+    33% { transform: translate(51px, -64px); }
+    50% { transform: translate(-83px, -17px); }
+    67% { transform: translate(29px, 77px); }
+    83% { transform: translate(-12px, -99px); }
+    100% { transform: translate(64px, 45px); }
 }
 
 @keyframes blink {

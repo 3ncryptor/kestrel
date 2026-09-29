@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
+import { ScrollMeter } from '@/components/motion/ScrollMeter';
+import { SmoothScroll } from '@/components/motion/SmoothScroll';
 import { Footer } from '@/components/site/Footer';
 import { Nav } from '@/components/site/Nav';
 import { SiteShortcuts } from '@/components/site/SiteShortcuts';
@@ -38,6 +40,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                 <Footer />
                 <Toaster theme="dark" position="bottom-center" />
                 <SiteShortcuts items={search} />
+                <SmoothScroll />
+                <ScrollMeter />
             </body>
         </html>
     );

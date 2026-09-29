@@ -88,7 +88,7 @@ test('⌘K searches the docs and takes you to the result', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     await page.keyboard.press('ControlOrMeta+k');
-    const input = page.getByRole('dialog').getByRole('textbox');
+    const input = page.getByRole('dialog').getByRole('combobox', { name: /search/i });
     await expect(input).toBeFocused();
     await input.fill('readiness');
     await input.press('Enter');

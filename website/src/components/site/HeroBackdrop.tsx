@@ -2,22 +2,17 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
+import { useMotionGate } from '@/components/motion/useMotionGate';
 
-// The WebGL grain is decoration: it loads only after hydration, on a desktop-class device, without
-// reduced motion. Everywhere else a static gradient (the CSS below) stands in.
+// The WebGL grain is decoration: it loads only after hydration, on a desktop-class device, when the motion gate
+// allows rich effects. Everywhere else a static gradient (the CSS below) stands in.
 const Grainient = dynamic(() => import('@/components/ui/dither').then((m) => m.Grainient), { ssr: false });
 
-const MIN_CORES = 4;
-
-function canAnimate() {
-    const fine = window.matchMedia('(min-width: 768px) and (pointer: fine)').matches;
-    const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    return fine && !calm && (navigator.hardwareConcurrency ?? 0) >= MIN_CORES;
-}
-
 export function HeroBackdrop() {
-    const [webgl, setWebgl] = useState(false);
-    useEffect(() => setWebgl(canAnimate()), []);
+    const { rich } = useMotionGate();
+    const [desktop, setDesktop] = useState(false);
+    useEffect(() => setDesktop(window.matchMedia('(min-width: 768px) and (pointer: fine)').matches), []);
+    const webgl = rich && desktop;
 
     return (
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
